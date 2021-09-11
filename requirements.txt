@@ -271,5 +271,4 @@ zipp @ file:///tmp/build/80754af9/zipp_1615904174917/work
 zope.event==4.5.0
 zope.interface @ file:///C:/ci/zope.interface_1616357322857/work
 whitenoise==5.0.1
-pytz==2019.3
 sqlparse==0.3.1
