@@ -130,7 +130,7 @@ WSGI_APPLICATION = 'ipearanceMain.wsgi.application'
 
 
 DATABASES = {
-default: dj_database_url.config()
+default: dj_database_url.config(default='postgres://zavijevgkszdsh:bd05ad751087735c3de508bd13eca40a1f8d798a3b31982d2cc8b0c668355ad7@ec2-63-33-239-176.eu-west-1.compute.amazonaws.com:5432/d8f7pocv9fj2os')
 }
 
 
