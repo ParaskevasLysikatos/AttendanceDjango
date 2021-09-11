@@ -14,8 +14,6 @@ from pathlib import Path
 import os
 
 import django_heroku
-import dj_database_url
-DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -129,7 +127,17 @@ WSGI_APPLICATION = 'ipearanceMain.wsgi.application'
 #     }
 # }
 
-DATABASES['default'] = dj_database_url.config(default='postgres://zavijevgkszdsh:bd05ad751087735c3de508bd13eca40a1f8d798a3b31982d2cc8b0c668355ad7@ec2-63-33-239-176.eu-west-1.compute.amazonaws.com:5432/d8f7pocv9fj2os')
+
+DATABASES = {
+    'default': { 
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'd8f7pocv9fj2os', 
+        'USER': 'zavijevgkszdsh', 
+        'PASSWORD': 'bd05ad751087735c3de508bd13eca40a1f8d798a3b31982d2cc8b0c668355ad7',
+        'HOST': 'ec2-63-33-239-176.eu-west-1.compute.amazonaws.com', 
+        'PORT': '5432',
+    }
+}
 
 
 
