@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8" />
+    <!-- κληρονομεί οτι υπαρχει μεσα στο basic.html -->
+    {% include "basic.html" %}
+    
+    <title>Members Team</title>
+    
+  </head>
+
+  <body>
+    <!-- ενσωματωση του navbar -->
+    {% include "myNav.html" %}
+     <br>
+     <center>
+     <h2>Μέλη ομάδας</h2>
+     </center>
+     <br>
+     <div class="container">
+      <p style="padding:20px;" class="border border-secondary"><i class="fas fa-exclamation-circle"></i> &nbsp Τα μέλη ομάδας χρησιμοποιούνται κατά τη δημιουργία χρήστη, ώστε να ορίζουν τη διαχείριση της εφαρμογής με βάση το οργανόγραμμα.</p>
+      
+      <div style="padding:5px;" class="border border-secondary">
+      <p><i class="fas fa-angle-right"></i> &nbsp Τα μέλη ομάδας Διαχειριστής διαχειρίζονται όλα τα τμήματα του οργανογράμματος.</p>
+      
+      <p><i class="fas fa-angle-right"></i> &nbsp Τα μέλη ομάδας Δήμαρχος βλέπουν όλα τα τμήματα του
+        οργανογράμματος.</p>
+      
+      <p><i class="fas fa-angle-right"></i> &nbsp Τα μέλη ομάδας Διευθυντής βλέπει την διεύθυνση και τα τμήματά τους πιο κάτω.</p>
+      
+       <p><i class="fas fa-angle-right"></i> &nbsp Τα μέλη ομάδας Προϊστάμενος βλέπει μόνο το τμήμα του.</p>
+       
+       <p><i class="fas fa-angle-right"></i> &nbsp Τα μέλη ομάδας Υπάλληλος βλέπει μόνο τον εαυτό του στο τμήμα του.</p>
+       </div>
+      </div>
+      <br>
+    
+
+   
+   <div style="padding:10px;width:60%;" class="container border border-secondary">
+     <center>
+     <h5>Αποθηκευμένα μέλη ομάδας</h5>
+     </center>
+   <table class="table table-responsive-md table-hover table-striped">
+        <thead class="table-warning">
+          <tr >
+            <th>A/A</th>
+            <th>Όνομα μέλους ομάδας</th>
+            <th>Αριθμός κατάταξης</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          {% for item in MembersTeam %}
+          <tr>
+            <td>{{item.id}}</td>
+            <td>{{item.member_team_name}}</td>
+            <td>{{item.member_team_weight}}</td>
+          </tr>
+          {% endfor %}
+
+        </tbody>
+      </table>
+
+    </div>
+    
+  </body>
+ 
+
+</html>

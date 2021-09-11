@@ -1,0 +1,24 @@
+ <div id="table" class="row">
+            <div class="col-10">
+              <table class="table table-responsive-md table-hover table-striped">
+                <tbody>
+                {% if mySearch %}
+                  {% for item in mySearch %}
+                  <tr>
+            <td>{{item.IDuser}}</td>
+            <td>{{item.date|date:"D d M Y"}}</td>
+            <td>{{item.last_name}}</td>
+            <td>{{item.first_name}}</td>
+            <td>{{item.wrario}}</td>
+            <td>{{item.department}}</td>
+             <td>{{item.relationType}}</td>
+          </tr>
+                  {% endfor %}
+                  {% endif %}
+                  {% if noResults %}
+            <p style="margin:20px;" >Δεν βρέθηκαν ωράρια.</p>
+                    {% endif %}
+                </tbody>
+              </table>
+            </div>
+          </div>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    {% include "basic.html" %}
+    {% load static %}
+    <title>Print Attendance</title>
+  </head>
+
+  <body>
+    <script>
+      $(document).ready(function () {
+        $('#depSelect').select2({
+          theme: "classic",
+          placeholder: 'Select an option'
+        });
+      });
+
+    </script>
+    <!-- ΕΜΦΑΝΙΣΗ nAVBAR -->
+    {% include "myNav.html" %}
+
+    <div style="width:95%;" class="container-xxl container-fluid">
+      <br>
+      <center>
+        <h2>Εκτύπωση παρουσιών</h2>
+      </center>
+      <br>
+      <div style="margin-left:10%;padding:15px;width:80%" class="border border-secondary">
+        <form action="{% url 'printAttendance' %}" method="post" enctype="multipart/form-data">
+          <!-- TOKEN GIA AU8ENTIKOPOIHSH -->
+          {% csrf_token %}
+          <div class="form-row d-flex justify-content-around">
+            <div  class="form-group col-md-4">
+              <label for="depSelect">Επιλογή τμήματος</label>
+              <select  id="depSelect" name="dep_id" class="form-control">
+                {% for d in departments %}
+                <option value={{d.id}}>{{d.department_name}}</option>
+
+                {% endfor %}
+              </select>
+            </div>
+            <div class=" form-group col-md-3">
+              <label class="control-label">Hμερομηνία από (κενό:χθες)</label>
+              <input type="date" class="form-control" name="startMyDate" max="{{myDateMax}}">
+            </div>
+            <div class="form-group col-md-3">
+              <label class="control-label">Hμερομηνία εώς (κενό:χθες)</label>
+              <input type="date" class="form-control" name="endMyDate" max="{{myDateMax}}">
+            </div>
+          </div>
+          <div class="row d-flex justify-content-around">
+            <div class="col-md-3">
+              <label class="control-label">Επιλογή Υπογραφής</label>
+              <select id="inputState" name="signatures" class="form-control">
+                {% for s in signatures %}
+                <option value={{s.signature_name}}>{{s.signature_name}}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="control-label">Επιλογή Εκτύπωσης</label>
+              <select id="inputState" name="choicePrint" class="form-control">
+                <option value="analytic">Αναλυτική Κατάσταση Παρουσιών</option>
+                <option value="e-p-day">Ελλείμματα-Πλεονάσματα ανά ημέρα</option>
+                <option value="e-p-periodic">Ελλείμματα-Πλεονάσματα ανά περίοδο</option>
+                <option value="periodic">Περιοδική Κατάσταση Παρουσιολογίου</option>
+              </select>
+            </div>
+            <div style="margin-top:32px;" class="col-md-2">
+              <button type="submit" class="btn btn-primary">Δείξε εκτύπωση</button>
+            </div>
+        </form>
+        <div class="col-md-2">
+          {% if date1  %}
+          {% ifequal ChoicePrint "analytic" %}
+          <form action="{% url 'printAttendancePDF' %}" method="post">
+            {% csrf_token %}
+            <button style="margin-top:32px;" type="submit" class="btn btn-secondary">Εκτύπωση Αναλυτική</button>
+            </form>
+            {% endifequal %}
+            {% ifequal ChoicePrint "periodic" %}
+            <form action="{% url 'printPeriodicAttPDF' %}" method="post">
+              {% csrf_token %}
+              <button style="margin-top:32px;" type="submit" class="btn btn-secondary">Εκτύπωση Περιοδική</button>
+            </form>
+            {% endifequal %}
+            {% ifequal ChoicePrint "e-p-day" %}
+            <form action="{% url 'printElPlDayPDF' %}" method="post">
+              {% csrf_token %}
+              <button style="margin-top:32px;" type="submit" class="btn btn-secondary">Εκτύπωση Ελ/Πλ Ημέρα</button>
+            </form>
+            {% endifequal %}
+            {% ifequal ChoicePrint "e-p-periodic" %}
+            <form action="{% url 'printElPlPeriodicPDF' %}" method="post">
+              {% csrf_token %}
+              <button style="margin-top:32px;" type="submit" class="btn btn-secondary">Εκτύπωση Ελ/Πλ Περίοδο</button>
+            </form>
+            {% endifequal %}
+            {% endif %}
+        </div>
+      </div>
+    </div>
+
+    {% include "messages.html" %}
+
+    <table class="table table-striped table-bordered table-hover">
+      {% if date1 %}
+      <center>
+        <h2 class="table-warning">{{dep}}, Aπό:{{date1}}, εώς:{{date2}}</h2>
+      </center>
+      {% endif %}
+
+
+      <thead class="table-warning">
+        <tr>
+          <th>Χρήστης</th>
+
+          <!-- <th>ID</th> -->
+          <th>Άφιξη</th>
+          <th>Αποχώρηση</th>
+          {% comment %} <th>Ημέρα</th> {% endcomment %}
+          <th>Ωράριο</th>
+          <th>Υποχρεωτικές ωρες</th>
+          <th>Ώρες</th>
+          <th>Εντός ωραρίου</th>
+          <th>Παρατηρήσεις</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        {% for d in SumDays %}
+        {% for dep in SumDeps %}
+        
+        <tr class="table-warning">
+          <td></td>
+          <td></td>
+          <td></td>
+          <th>{{d.day}} {{dep.DepName}}</th>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+
+
+        {% for row in fullattendaces %}
+        {% ifequal d.day row.day %}
+        {% ifequal dep.DepName row.department %}
+        <tr>
+          <td><i>{{row.Role}}</i>:({{row.user_card}}) {{row.first_name}} {{row.last_name}} του {{row.fathers_name}}</td>
+          <td>{{row.Fattendance_time}}</td>
+          <td>{{row.Lattendance_time}}</td>
+          {% comment %} <td>{{row.day}}</td> {% endcomment %}
+          <td>{{row.wrario}}</td>
+          <td>{{row.should_work_hours}}</td>
+
+          <td>{{row.worked_hours}}</td>
+          <td>{{row.worked_hours_in_range}}</td>
+          <td>{{row.Hrms}}</td>
+        </tr>
+        {% endifequal %}
+        {% endifequal %}
+        {% endfor %}
+        {% endfor %}
+        {% endfor %}
+      </tbody>
+    </table>
+    </div>
+
+  </body>
+
+</html>

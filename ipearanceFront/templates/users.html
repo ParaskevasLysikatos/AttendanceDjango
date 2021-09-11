@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8" />
+    {% include "basic.html" %} {% load static %}
+    <link rel="stylesheet" href="{% static 'allCss/users.css' %}" />
+    
+    <title>Users</title>
+  </head>
+
+  <body>
+
+
+    <!-- εισαγωγή του navbar -->
+    {% include "myNav.html" %}
+    <div>
+    <br>
+      <h2 class="d-flex justify-content-around">
+        Προσωπικό
+      </h2>
+      {% include "messages.html" %}
+      <form action="{% url 'synchronizeData' %}" method="post">
+        <div class="form-row">
+          <div style="margin-left:20px;" class="form-group col-md-2">
+            {% csrf_token %}
+            <button type="submit" class="form-control btn btn-primary">ΣυγχρονισμόςΠροσωπικού</button>
+          </div>
+          <div style="margin-left:20px;" class=" form-group col-md-3">
+            <input id="user-input" class="form-control" placeholder="Αναζήτιση με username ή Όνομα/Επώνυμο">
+          </div>
+          <div id="search-icon" style="margin-left:20px;" class=" form-group col-md-1">
+            <i  class="fa fa-search"></i>
+          </div>
+          <div style="margin-left:20px;" class=" form-group col-md-2">
+            <input id="user-input2" type="number" class="form-control" placeholder="Αναζήτιση με αριθμό κάρτας">
+          </div>
+          <div id="search-icon2" style="margin-left:20px;" class=" form-group col-md-1">
+            <i  class="fa fa-search"></i>
+          </div>
+          <div style="margin-left:20px;" class="form-group col-md-1">
+            <button type="button" class="btn btn-secondary" data-toggle="modal"  onclick="myFailExport()"
+              data-target="#ModalAdd">Νέος
+              Χρήστης</button>
+          </div>
+        </div>
+
+    </div>
+    </form>
+    <div style="margin-left:20px;" id="replaceable-content">
+      {% include "searchUsersUsername-partial.html" %}
+    </div>
+    <div style="margin-left:20px;" id="replaceable-content2">
+      {% include "searchUsersCard-partial.html" %}
+    </div>
+
+
+    <div id="table" class="row">
+      <div class="col-11" style="margin:20px;">
+        <table class="table table-responsive-lg table-hover table-striped">
+          <thead class="table-warning">
+            <tr>
+              <th>UID</th>
+              <th>Επίθετο</th>
+              <th>Ονομα</th>
+              <th>Πατρώνυμο</th>
+              <th>Username</th>
+              <th>ID Κάρτας</th>
+              <th>Αριθμός Κάρτας</th>
+              <th>Email</th>
+              <th>Ενέργειες</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- εισαγωγη των αρχειων απο python/excel μεσα στον πίνακα -->
+            {% comment %} {% for row in excel %}
+            <tr>
+              {% for cell in row %}
+              <td>{{ cell }}</td>
+              {% endfor %}
+              <br />
+            </tr>
+            {% endfor %} {% endcomment %}
+            {% for item in myUsers %}
+            <tr>
+              <td>{{item.id}}</td>
+              <td>{{item.last_name}}</td>
+              <td>{{item.first_name}}</td>
+              <td>{{item.fathers_name}}</td>
+              <td>{{item.username}}</td>
+              <td>{{item.device_card_id}}</td>
+              <td>{{item.device_card_number}}</td>
+              <td>{{item.email}}</td>
+              <td>
+
+                <button type="button" onclick="myFunction(id={{item.id}},Mem={{Members}},Rel={{RelationT}})" class="btn btn-primary" data-toggle="modal"
+                  data-target="#ModalEdit">
+                  Επεξεργασία
+                </button>
+
+              </td>
+            </tr>
+            {% endfor %}
+
+          </tbody>
+        </table>
+      </div>
+
+
+      <div class="modal fade" id="ModalAdd" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Προσθήκη χρήστη</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <!-- φορμα προσθήκης νέου χρηστη στο συστημα -->
+              <div class="col-7">
+                <div>
+                  <form class="form-horizontal" action="{% url 'userAdd' %}" method="post">
+                    {% csrf_token %}
+
+                    <div class="form-group" id="Fail">
+                      {{ form.non_field_errors }}
+                      {% for field in form %}
+                      <p>
+                        {{ field.label_tag }}<br>
+                        {{ field }}
+                        <small style="color: grey">{{ field.help_text }}</small>
+
+
+                        <strong> {{ field.errors }}</strong>
+
+                      </p>
+                      {% endfor %}
+
+
+                    </div>
+
+                </div>
+
+              </div>
+
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Κλείσιμο</button>
+              <button type="submit" onclick="myFailSave()" class="btn btn-primary">Αποθήκευση</button>
+            </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    </div>
+
+
+    <!-- Modal for edit-->
+    <div class="modal fade" id="ModalEdit" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Επεξεργασία χρήστη</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div id="edit">
+              <form class="form-horizontal" action="{% url 'userEdit'%}" method="post"
+                 autocomplete="off">
+                {% csrf_token %}
+                <div class="form-group" id="editForFind">
+                  {{ formE.non_field_errors }}
+                  {% for field in formE %}
+                  <p>
+                    {{ field.label_tag }}<br>
+                    {{ field }}
+                    <small style="color: grey">{{ field.help_text }}</small>
+
+
+                    <strong> {{ field.errors }}</strong>
+
+                  </p>
+                  {% endfor %}
+                  {{ formP.non_field_errors }}
+
+
+                </div>
+
+                <input type="hidden" name="id" id="passEditId">
+            </div>
+          </div>
+          <div class="modal-footer">
+          <div style="margin-right:30%;">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Κλείσιμο</button>
+            <button type="submit" class="btn btn-primary">Αποθήκευση</button>
+            </div>
+            </form>
+            <form class="form-horizontal" action="{% url 'userDelete'%}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="idDel" id="passDeleteId">
+            <button type="submit" class="btn btn-danger">Διαγραφή</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+       
+
+      {% if myUsers.has_other_pages %}
+      <ul class="pagination pagination-lg">
+        {% if myUsers.has_previous %}
+        <li class="page-item"><a class="page-link" href="?page={{ myUsers.previous_page_number }}">&laquo;</a></li>
+        {% else %}
+        <li class="page-item disabled"><span>&laquo;</span></li>
+        {% endif %}
+        {% for i in myUsers.paginator.page_range %}
+        {% if myUsers.number == i %}
+        <li class="page-item active"><span class="page-link">{{ i }} <span class="sr-only">(current)</span></span></li>
+        {% comment %} {% else %} {% endcomment %}
+        
+        
+         {% elif i > myUsers.number|add:'-3' and i < myUsers.number|add:'3' %}
+        <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+        
+        {% endif %}
+        
+        {% if  myUsers.number|add:'3' == i %}
+        <li class="page-item"><a class="page-link">⋯</a></li>
+        <li class="page-item"><a class="page-link" href="?page={{myUsers.paginator.num_pages}}">{{myUsers.paginator.num_pages }}</a></li>
+         {% endif %}
+         
+        {% if  myUsers.number|add:'-3' == i %}
+        <li class="page-item"><a class="page-link" href="?page={{1}}">{{1}}</a></li>
+        <li class="page-item"><a class="page-link">⋯</a></li>
+         {% endif %}
+         
+        {% comment %} <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+        {% endif %}  {% endcomment %}
+        {% endfor %}
+        
+
+        {% if myUsers.has_next %}
+        <li class="page-item"><a class="page-link" href="?page={{ myUsers.next_page_number }}">&raquo;</a></li>
+        {% else %}
+        <li class="page-item disabled"><span>&raquo;</span></li>
+        {% endif %}
+      </ul>
+      {% endif %}
+
+    </div>
+  </body>
+  <script>
+    function myFunction(
+      id,Mem,Rel
+    ) { // ajax to perform get request to get the string object based on id, which is printed inside the function of button epeksergasia
+      console.log(id)
+      console.log(Mem)
+      console.log(Rel)
+      ajaxObject = $.ajax({
+        method: 'GET',
+        url: "userGet/" + id,
+        contentType: 'application/json',
+        success: function (response) {
+          console.log(response);
+          var mySplit = response.split(','); // ret = self.username + ',' + self.first_name + "," + self.last_name+ ","+str(self.device_card_id)+","+str(self.device_card_number)+","+self.email+','+str(self.hrms_id) +','+str(self.is_active) +','+str(self.relation_type)+','+str(self.fathers_name)+','+str(self.mothers_name)+','+str(self.phone)+','+str(self.works_on_holidays)+','+str(self.member_team_name)
+          console.log(mySplit);
+          $("#passEditId").val(id); // we pass it to hidden field of edit form
+          $("#passDeleteId").val(id); // we pass it to hidden field of delete form
+          //we print the values in modal form of edit
+          
+          var hrms = $("#editForFind").find('p:nth-child(1)').find('input').val(mySplit[6]);
+          var cardNumber = $("#editForFind").find('p:nth-child(2)').find('input').val(mySplit[4]);
+          var cardID = $("#editForFind").find('p:nth-child(3)').find('input').val(mySplit[3]);
+          
+          var username = $("#editForFind").find('p:nth-child(4)').find('input').val(mySplit[0]); 
+          var first_name = $("#editForFind").find('p:nth-child(5)').find('input').val(mySplit[1]);
+          var last_name = $("#editForFind").find('p:nth-child(6)').find('input').val(mySplit[2]);
+          
+          if(mySplit[10]=='None'){
+          var father_name = $("#editForFind").find('p:nth-child(7)').find('input').text(mySplit[9]);
+          }else{
+            var father_name = $("#editForFind").find('p:nth-child(7)').find('input').val(mySplit[9]);
+          }
+          
+          if(mySplit[11]=='None'){
+          var mother_name = $("#editForFind").find('p:nth-child(8)').find('input').text(mySplit[10]);
+          }else{
+            var mother_name = $("#editForFind").find('p:nth-child(8)').find('input').val(mySplit[10]);
+          }
+          
+          //var works_holidays = $("#editForFind").find('p:nth-child(9)').find('input').val(mySplit[13]);
+          console.log(mySplit[12])
+          if (mySplit[12]=='True'){
+              $("#editForFind").find('p:nth-child(9)').find('input').prop('checked', true);
+            }
+            else{
+                 $("#editForFind").find('p:nth-child(9)').find('input').prop('checked', false);
+                  }
+            
+            if(mySplit[8]=='None'){
+          var relation_type = $("#editForFind").find('p:nth-child(10)').find('option:nth-child(1)').text(null);
+          var relation_type1= $("#editForFind").find('p:nth-child(10)').find('option:nth-child(1)').val(null);
+            }else{
+              var relation_type = $("#editForFind").find('p:nth-child(10)').find('option:nth-child(1)').text(mySplit[8]);
+              for (var item in Rel){
+              if (Rel[item].relation_type_name==mySplit[8])
+              {
+              var relation_type1= $("#editForFind").find('p:nth-child(10)').find('option:nth-child(1)').val(Rel[item].id);
+              }
+              }
+              
+            }
+            
+            
+          var phone = $("#editForFind").find('p:nth-child(11)').find('input').val(mySplit[11]);
+          var email = $("#editForFind").find('p:nth-child(12)').find('input').val(mySplit[5]);
+          var password = $("#editForFind").find('p:nth-child(13)').find('input').val(null);
+          
+          if(mySplit[13]=='None'){
+          var member= $("#editForFind").find('p:nth-child(14)').find('option:nth-child(1)').text(null);
+          var member1= $("#editForFind").find('p:nth-child(14)').find('option:nth-child(1)').val(null);
+          }else{
+            var member= $("#editForFind").find('p:nth-child(14)').find('option:nth-child(1)').text(mySplit[13]);
+            for (var item in Mem){
+              if (Mem[item].member_team_name==mySplit[13])
+              {
+                var member1= $("#editForFind").find('p:nth-child(14)').find('option:nth-child(1)').val(Mem[item].id);
+              }
+            }
+            
+            }
+        },
+        // Check for existence of file 
+        error: function (err) {
+          console.log(err);
+        }
+      });
+    }
+    
+    
+    
+    function myFailSave(
+    ){
+     
+    var hrms1 = $("#Fail").find('p:nth-child(5)').find('input').val();
+    sessionStorage.setItem('hrms1', hrms1);
+    console.log(hrms1)
+    
+    var cardNumber1 = $("#Fail").find('p:nth-child(8)').find('input').val();
+    sessionStorage.setItem('cardNumber1', cardNumber1);
+    console.log(cardNumber1)
+      
+    var username1 = $("#Fail").find('p:nth-child(1)').find('input').val();
+    sessionStorage.setItem('username1', username1);
+    console.log(username1)
+    
+    var first_name1= $("#Fail").find('p:nth-child(2)').find('input').val();
+    sessionStorage.setItem('first_name1', first_name1);
+    console.log(first_name1)
+    
+    
+    var last_name1 = $("#Fail").find('p:nth-child(3)').find('input').val();
+    sessionStorage.setItem('last_name1', last_name1);
+    console.log(last_name1)
+
+    var father_name1 = $("#Fail").find('p:nth-child(6)').find('input').val();
+    sessionStorage.setItem('father_name1', father_name1);
+    console.log(father_name1)
+    
+    var mother_name1 = $("#Fail").find('p:nth-child(7)').find('input').val();
+    sessionStorage.setItem('mother_name1', mother_name1);
+        console.log(mother_name1)
+        
+    var phone1 = $("#Fail").find('p:nth-child(10)').find('input').val();
+    sessionStorage.setItem('phone1', phone1);
+    console.log(phone1)
+    
+    var email1 = $("#Fail").find('p:nth-child(4)').find('input').val();
+    sessionStorage.setItem('email1', email1);
+    console.log(email1)
+    
+    }
+    
+    
+    function myFailExport(
+    ) { // ajax to perform get request to get the string object based on id, which is printed inside the function of
+    
+    $("#Fail").find('p:nth-child(5)').find('input').val(sessionStorage.getItem('hrms1'));
+    
+    $("#Fail").find('p:nth-child(8)').find('input').val(sessionStorage.getItem('cardNumber1'));
+
+    $("#Fail").find('p:nth-child(1)').find('input').val(sessionStorage.getItem('username1'));
+    $("#Fail").find('p:nth-child(2)').find('input').val(sessionStorage.getItem('first_name1'));
+    $("#Fail").find('p:nth-child(3)').find('input').val(sessionStorage.getItem('last_name1'));
+
+     $("#Fail").find('p:nth-child(6)').find('input').val(sessionStorage.getItem('father_name1'));
+     $("#Fail").find('p:nth-child(7)').find('input').val(sessionStorage.getItem('mother_name1'));
+
+    $("#Fail").find('p:nth-child(10)').find('input').val(sessionStorage.getItem('phone1'));
+    $("#Fail").find('p:nth-child(4)').find('input').val(sessionStorage.getItem('email1'));
+
+    }
+    
+  </script>
+
+
+  <script>
+    const user_input = $("#user-input")
+    const search_icon = $('#search-icon')
+    const search_div = $('#replaceable-content')
+    const endpoint = 'usersSearch'
+    const delay_by_in_ms = 700
+    let scheduled_function = false
+
+    let ajax_call = function (endpoint, request_parameters) {
+      $.getJSON(endpoint, request_parameters)
+        .done(response => {
+          // fade out the artists_div, then:
+          search_div.fadeTo('slow', 0).promise().then(() => {
+            // replace the HTML contents
+            search_div.html(response['html_from_view'])
+            // fade-in the div with new contents
+            search_div.fadeTo('slow', 1)
+            // stop animating search icon
+            search_icon.removeClass('blink')
+          })
+        })
+    }
+
+
+    user_input.on('keyup', function () {
+
+      const request_parameters = {
+        q: $(this).val() // value of user_input: the HTML element with ID user-input
+      }
+
+      // start animating the search icon with the CSS class
+      search_icon.addClass('blink')
+
+      // if scheduled_function is NOT false, cancel the execution of the function
+      if (scheduled_function) {
+        clearTimeout(scheduled_function)
+      }
+
+      // setTimeout returns the ID of the function to be executed
+      scheduled_function = setTimeout(ajax_call, delay_by_in_ms, endpoint, request_parameters)
+    })
+
+  </script>
+
+  <script>
+    const user_input2 = $("#user-input2")
+    const search_icon2 = $('#search-icon2')
+    const search_div2 = $('#replaceable-content2')
+    const endpoint2 = 'usersSearchNumID'
+    const delay_by_in_ms2 = 700
+    let scheduled_function2 = false
+
+    let ajax_call2 = function (endpoint2, request_parameters2) {
+      $.getJSON(endpoint2, request_parameters2)
+        .done(response => {
+          // fade out the artists_div, then:
+          search_div2.fadeTo('slow', 0).promise().then(() => {
+            // replace the HTML contents
+            search_div2.html(response['html_from_view'])
+            // fade-in the div with new contents
+            search_div2.fadeTo('slow', 1)
+            // stop animating search icon
+            search_icon2.removeClass('blink')
+          })
+        })
+    }
+
+
+    user_input2.on('keyup', function () {
+
+      const request_parameters2 = {
+        q: $(this).val() // value of user_input: the HTML element with ID user-input
+      }
+
+      // start animating the search icon with the CSS class
+      search_icon2.addClass('blink')
+
+      // if scheduled_function is NOT false, cancel the execution of the function
+      if (scheduled_function2) {
+        clearTimeout(scheduled_function2)
+      }
+
+      // setTimeout returns the ID of the function to be executed
+      scheduled_function2 = setTimeout(ajax_call2, delay_by_in_ms2, endpoint2, request_parameters2)
+    })
+
+  </script>
+
+</html>

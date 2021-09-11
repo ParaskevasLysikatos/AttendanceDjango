@@ -1,0 +1,35 @@
+<div id="table" class="row">
+            <div class="col-10">
+              <table class="table table-responsive-md table-hover table-striped">
+                <tbody>
+                {% if mySearch %}
+                  {% for item in mySearch %}
+                  <tr>
+                   <td>{{item.device_location}}</td>
+            <td>{{item.device_ip}}</td>
+            <td>
+              <div class="row">
+                <form action="{% url 'deviceData' %}" method="post">
+                  <input type="hidden" name="nameDevice" value="{{item.device_location}}" />
+                  <input type="hidden" name="IP" value="{{item.device_ip}}" />
+                  <input style="float: left;" type="submit" class="btn btn-primary" value="Επεξεργασία" />
+                  {% csrf_token %}
+                </form>
+                &nbsp
+                <form action="{% url 'deviceDelete' %}" method="post">
+                  <input type="hidden" name="idDevice" value="{{item.id}}" />
+                  <input style="float: right;" type="submit" class="btn btn-danger" value="Διαγραφή" />
+                  {% csrf_token %}
+                </form>
+                <div>
+            </td>
+                  </tr>
+                  {% endfor %}
+                  {% endif %}
+                  {% if noResults %}
+            <p style="margin:20px;" >Δεν βρέθηκαν συσκευές.</p>
+                    {% endif %}
+                </tbody>
+              </table>
+            </div>
+          </div>

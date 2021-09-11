@@ -1,0 +1,18 @@
+ <div class="col-9">
+     <table class="table table-hover table-striped">
+         <tbody>
+             {% if mySearch %}
+             {% for row in mySearch %}
+           <tr>
+               <!-- στοιχεια που ερχονται απο python -->
+              
+               <td>{{ row }} </td>
+           </tr>
+             {% endfor %}
+             {% endif %}
+             {% if noResults %}
+             <p style="margin:20px;">Δεν βρέθηκαν παρουσίες συσκευής.</p>
+             {% endif %}
+         </tbody>
+     </table>
+ </div>

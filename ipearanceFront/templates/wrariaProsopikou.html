@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8" />
+    <!-- κληρονομεί οτι υπαρχει μεσα στο basic.html -->
+    {% include "basic.html" %}
+    
+    <title>wraria Prosopikou</title>
+    <style>
+      @keyframes blinker {
+        from {
+          opacity: 1.0;
+        }
+
+        to {
+          opacity: 0.0;
+        }
+      }
+
+      .blink {
+        text-decoration: blink;
+        animation-name: blinker;
+        animation-duration: 0.6s;
+        animation-iteration-count: infinite;
+        animation-timing-function: ease-in-out;
+        animation-direction: alternate;
+      }
+
+    </style>
+  </head>
+
+  <body>
+  <script>
+    $(document).ready(function() {
+    $('#dep').select2({
+      theme: "classic",
+      placeholder: 'Select an option'
+      });     
+    });  
+    </script>
+  
+    <!-- ενσωματωση του navbar -->
+    {% include "myNav.html" %}
+     <br>
+     <center>
+     <h2>Προβολή/Εκτύπωση Ωραρίων Προσωπικού</h2>
+     </center>
+      <br>
+    <div style="padding:10px;width:80%;" class="container border border-secondary">
+     <center>
+     <h5>Αναζήτηση Ωραρίων ανά Τμήμα</h5>
+     </center>
+      <form action="{% url 'wrariaProsopikou' %}" method="post">
+        {% csrf_token %}
+            <div class="form-row">
+          <div class="form-group col-md-3">
+            <label for="inputState">Τμήματα</label>
+            <select id="dep" name="dep_id" class="form-control">
+              {% for d in Departments %}
+              <option value={{d.id}}>{{d.department_name}}</option>
+              {% endfor %}
+            </select>
+          </div>
+           <div class="form-group col-md-3">
+            <label for="inputState">Ημέρα από (κενό:σημερα)</label>
+            <input class="form-control"  type="date"  name="startDate" >
+          </div>
+           <div class="form-group col-md-3">
+            <label for="inputState">Ημέρα εώς (κενό:σημερα)</label>
+            <input class="form-control"  type="date"  name="endDate" >
+          </div>
+          <div class="col-md-3">
+            <label class="control-label">Υπογραφή</label>
+            <select id="inputState" name="signatures" class="form-control">
+              {% for s in signatures %}
+              <option value={{s.signature_name}}>{{s.signature_name}}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+  <div class="row d-flex justify-content-center">
+  <button type="submit" class="btn btn-success">Αναζήτηση</button>
+  </div>
+</form>
+    </div>
+
+   {% include "messages.html" %}
+   
+    <br>
+      <div class="row d-flex justify-content-center">
+        <div style="margin-left:20px;" class=" form-group col-md-2">
+          <input id="wrariaProsopikou-input" class="form-control" placeholder="Αναζήτιση με Όνομα/Επώνυμο">
+        </div>
+        <div id="search-icon" class=" form-group col-md-1">
+          <i  class="fa fa-search"></i>
+        </div>
+         {% if WrariaStaff %}
+         <div style="margin-left:50px;" class=" form-group col-md-1">
+            <form action="{% url 'printWrariaProsopikouPDF' %}" method="post">
+                {% csrf_token %}
+            <button type="submit" class="btn btn-primary">Εκτύπωση PDF</button>
+            </div>
+             </form>
+             
+             <div style="margin-left:50px;" class=" form-group col-md-1">
+               <form action="{% url 'printWrariaProsopikouExcel' %}" method="post">
+                 {% csrf_token %}
+                 <button type="submit" class="btn btn-secondary">Εκτύπωση Excel</button>
+             </div>
+             </form>
+            {% endif %}
+           
+            </div>
+      </div>
+
+      <div style="margin-left:20px;" id="replaceable-content">
+        {% include "searchWrariaProsopikou-partial.html" %}
+      </div>
+      <br> 
+   
+   <div style="padding:10px;width:100%;" class="container border border-secondary">
+     <center>
+     <h5>Αποτελέσματα {% if dep %} για {{dep}} {% endif %}</h5>
+     </center>
+   <table class="table table-responsive-md table-hover table-striped">
+        <thead class="table-warning">
+          <tr class="">
+            <th>A/A</th>
+            <th>Ημερομηνία</th>
+            <th>Επώνυμο</th>
+            <th>Όνομα</th>
+            <th>Ωράριο</th>
+            <th>Τμήμα</th>
+            <th>Ειδικότητα</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          {% for item in WrariaStaff %}
+          <tr>
+            <td>{{item.IDuser}}</td>
+            <td>{{item.date}}</td>
+            <td>{{item.last_name}}</td>
+            <td>{{item.first_name}}</td>
+            <td>{{item.wrario}}</td>
+            <td>{{item.department}}</td>
+             <td>{{item.relationType}}</td>
+          </tr>
+          {% endfor %}
+
+        </tbody>
+      </table>
+      <br>
+    <div class="d-flex justify-content-center">
+      {% if WrariaStaff.has_other_pages %}
+      <ul class="pagination pagination-lg ">
+        {% if WrariaStaff.has_previous %}
+        <li class="page-item"><a class="page-link" href="?page={{ WrariaStaff.previous_page_number }}">&laquo;</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled"><span>&laquo;</span></li>
+        {% endif %}
+        {% for i in WrariaStaff.paginator.page_range %}
+        {% if WrariaStaff.number == i %}
+        <li class="page-item active"><span class="page-link">{{ i }} <span class="sr-only">(current)</span></span>
+        </li>
+
+        {% elif i > WrariaStaff.number|add:'-3' and i < WrariaStaff.number|add:'3' %}
+        <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+
+        {% endif %}
+
+        {% if  WrariaStaff.number|add:'3' == i %}
+        <li class="page-item"><a class="page-link">⋯</a></li>
+        <li class="page-item"><a class="page-link"
+            href="?page={{WrariaStaff.paginator.num_pages}}">{{WrariaStaff.paginator.num_pages }}</a></li>
+        {% endif %}
+
+        {% if  WrariaStaff.number|add:'-3' == i %}
+        <li class="page-item"><a class="page-link" href="?page={{1}}">{{1}}</a></li>
+        <li class="page-item"><a class="page-link">⋯</a></li>
+        {% endif %}
+        {% comment %} {% else %}
+        <li class="page-item"><a class="page-link" href="?pageA={{ i }}">{{ i }}</a></li>
+        {% endif %} {% endcomment %}
+        {% endfor %}
+        {% if WrariaStaff.has_next %}
+        <li class="page-item"><a class="page-link" href="?page={{ WrariaStaff.next_page_number }}">&raquo;</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled"><span>&raquo;</span></li>
+        {% endif %}
+      </ul>
+      {% endif %}
+    </div>
+<br>
+    </div>
+    
+  </body>
+  <script>
+    const wrariaProsopikou_input = $("#wrariaProsopikou-input")
+    const search_icon = $('#search-icon')
+    const search_div = $('#replaceable-content')
+    const endpoint = 'wrariaProsopikouSearch'
+    const delay_by_in_ms = 700
+    let scheduled_function = false
+
+    let ajax_call = function (endpoint, request_parameters) {
+      $.getJSON(endpoint, request_parameters)
+        .done(response => {
+          // fade out the artists_div, then:
+          search_div.fadeTo('slow', 0).promise().then(() => {
+            // replace the HTML contents
+            search_div.html(response['html_from_view'])
+            // fade-in the div with new contents
+            search_div.fadeTo('slow', 1)
+            // stop animating search icon
+            search_icon.removeClass('blink')
+          })
+        })
+    }
+
+
+    wrariaProsopikou_input.on('keyup', function () {
+
+      const request_parameters = {
+        q: $(this).val() // value of user_input: the HTML element with ID user-input
+      }
+
+      // start animating the search icon with the CSS class
+      search_icon.addClass('blink')
+
+      // if scheduled_function is NOT false, cancel the execution of the function
+      if (scheduled_function) {
+        clearTimeout(scheduled_function)
+      }
+
+      // setTimeout returns the ID of the function to be executed
+      scheduled_function = setTimeout(ajax_call, delay_by_in_ms, endpoint, request_parameters)
+    })
+
+  </script>
+
+</html>

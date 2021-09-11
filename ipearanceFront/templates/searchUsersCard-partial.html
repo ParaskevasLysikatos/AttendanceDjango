@@ -1,0 +1,34 @@
+
+          <div id="table" class="row">
+            <div class="col-10">
+              <table class="table table-responsive-md table-hover table-striped">
+                <tbody>
+                {% if mySearch %}
+                  {% for item in mySearch %}
+                  <tr>
+                    <td>{{item.id}}</td>
+                    <td>{{item.first_name}}</td>
+                    <td>{{item.last_name}}</td>
+                    <td>{{item.username}}</td>
+                    <td>{{item.device_card_id}}</td>
+                    <td>{{item.device_card_number}}</td>
+                    <td>{{item.email}}</td>
+                    <td>
+
+                      <button type="button" onclick="myFunction(id={{item.id}})" class="btn btn-primary"
+                        data-toggle="modal" data-target="#ModalEdit">
+                        Επεξεργασία
+                      </button>
+
+                    </td>
+                  </tr>
+                  {% endfor %}
+                  {% endif %}
+                  {% if noResults %}
+            <p style="margin:20px;" >Δεν βρέθηκαν χρήστες.</p>
+                    {% endif %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        

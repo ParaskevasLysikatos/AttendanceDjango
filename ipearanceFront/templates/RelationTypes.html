@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8" />
+    <!-- κληρονομεί οτι υπαρχει μεσα στο basic.html -->
+    {% include "basic.html" %}
+    
+    <title>Relation types</title>
+    
+  </head>
+
+  <body>
+    <!-- ενσωματωση του navbar -->
+    {% include "myNav.html" %}
+     <br>
+     <center>
+     <h2>Σχέση εργασίας</h2>
+     </center>
+     <br>
+     <div class="container">
+      <p style="padding:5px;" class="border border-secondary"><i class="fas fa-exclamation-circle"></i> &nbsp Οι σχέσεις εργασίας χρησιμοποιούνται κατά τη δημιουργία χρήστη, ώστε να αναγράφεται ο επιθυμητή σχέση εργασίας .</p>
+      </div>
+      <br>
+    <div style="padding:10px;width:60%;" class="container border border-secondary">
+     <center>
+     <h5>Προσθήκη σχέσης εργασίας</h5>
+     </center>
+      <form action="{% url 'relationType' %}" method="post">
+        {% csrf_token %}
+            <div class="form-row">
+          <div class="form-group col-md-7">
+            <label for="inputState">Όνομα σχέσης εργασίας</label>
+            <input class="form-control"  type="text"  name="name_RelationType" required>
+          </div>
+        </div>
+  <center>
+  <button type="submit" class="btn btn-success">Προσθήκη</button>
+  </center>
+</form>
+
+    </div>
+
+   {% include "messages.html" %}
+   
+    <br>
+
+   
+   <div style="padding:10px;width:60%;" class="container border border-secondary">
+     <center>
+     <h5>Αποθηκευμένες σχέσεις εργασίας</h5>
+     </center>
+   <table class="table table-responsive-md table-hover table-striped">
+        <thead class="table-warning">
+          <tr>
+            <th>A/A</th>
+            <th>Όνομα σχέση εργασίας</th>
+            <th>Ενέργειες</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          {% for item in RelationTypes %}
+          <tr>
+            <td>{{item.id}}</td>
+            <td>{{item.relation_type_name}}</td>
+            <td>
+              <div class="row">
+                <form action="{% url 'relationTypeDelete' %}" method="post">
+                  <input type="hidden" name="id_relationType" value="{{item.id}}" />
+                  <input style="float: right;" type="submit" class="btn btn-danger" value="Διαγραφή" />
+                  {% csrf_token %}
+                </form>
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <button type="button" onclick="myFunction(id={{item.id}})" class="btn btn-primary" data-toggle="modal"
+                  data-target="#ModalEdit">
+                  Επεξεργασία
+                </button>
+                <div>
+            </td>
+
+          </tr>
+          {% endfor %}
+
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- Modal for edit-->
+    <div class="modal fade" id="ModalEdit" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog  modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Επεξεργασία Σχέσης Εργασίας</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div id="edit">
+              <form class="form-horizontal" action="{% url 'relationTEdit'%}" method="post" autocomplete="off">
+                {% csrf_token %}
+                <div class="form-group" id="editForFind">
+                  <div class="form-row">
+                    <div class="form-group col-md-7">
+                      <label for="inputState">Όνομα σχέσης εργασίας</label>
+                      <input id="relationNameEdit" class="form-control" type="text" name="name_RelationType" required>
+                    </div>
+                  </div>
+                </div>
+                <input type="hidden" name="id" id="passEditId">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <div style="margin-right:30%;">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Κλείσιμο</button>
+              <button type="submit" class="btn btn-primary">Αποθήκευση</button>
+            </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+ 
+ <script>
+   function myFunction(
+     id
+   ) { // ajax to perform get request to get the string object based on id, which is printed inside the function of button epeksergasia
+     console.log(id)
+     ajaxObject = $.ajax({
+       method: 'GET',
+       url: "relationTGet/" + id,
+       contentType: 'application/json',
+       success: function (response) {
+         console.log(response);
+         var mySplit = response.split(
+           ',');
+         console.log(mySplit);
+         $("#passEditId").val(id); // we pass it to hidden field of edit form
+
+         var role = $("#relationNameEdit").val(mySplit[0]);
+
+       },
+       // Check for existence of file 
+       error: function (err) {
+         console.log(err);
+       }
+     });
+   }
+ </script>
+
+</html>

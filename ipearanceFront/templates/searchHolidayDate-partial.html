@@ -1,0 +1,30 @@
+<div id="table" class="row">
+    <div class="col-10">
+        <table class="table table-responsive-md table-hover table-striped">
+            <tbody>
+                {% if mySearch %}
+                {% for item in mySearch %}
+                <tr>
+                    <td>{{item.id}}</td>
+                    <td>{{item.description}}</td>
+                    <td>{{item.date_from|date:"D d M Y"}}</td>
+                    <td>{{item.date_to|date:"D d M Y"}}</td>
+                    <td>
+                        <div class="row">
+                            <form action="{% url 'holidayDelete' %}" method="post">
+                                <input type="hidden" name="id_holi" value="{{item.id}}" />
+                                <input style="float: right;" type="submit" class="btn btn-danger" value="Διαγραφή" />
+                                {% csrf_token %}
+                            </form>
+                            <div>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% endif %}
+                {% if noResults %}
+                <p style="margin:20px;">Δεν βρέθηκε αργία.</p>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>

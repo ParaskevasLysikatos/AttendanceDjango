@@ -1,0 +1,28 @@
+
+          <div id="table" class="row">
+            <div class="col-10">
+              <table class="table table-responsive-md table-hover table-striped">
+                <tbody>
+                {% if mySearch %}
+                  {% for item in mySearch %}
+                  <tr>
+                    <td>{{item.id}}</td>
+                    <td>{{item.signature_name}}</td>
+                    <td>
+                <form action="{% url 'SignatureDelete' %}" method="post">
+                     {% csrf_token %}
+                  <input type="hidden" name="id_sign" value="{{item.id}}" />
+                  <input style="float: right;" type="submit" class="btn btn-danger" value="Διαγραφή" />
+                </form>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                  {% endif %}
+                  {% if noResults %}
+            <p style="margin:20px;" >Δεν βρέθηκε υπογραφή.</p>
+                    {% endif %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        

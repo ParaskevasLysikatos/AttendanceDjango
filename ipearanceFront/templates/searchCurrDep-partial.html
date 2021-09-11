@@ -1,0 +1,73 @@
+<div id="table" class="row">
+    <div class="col-10">
+        <table class="table table-responsive-md table-hover table-striped">
+            <tbody>
+                {% if mySearch %}
+                <!-- {% for item in mySearch %} -->
+                <tbody>
+
+                    <!-- DIABASMA pinaka fullattendaces kai emfanisi sto frontend -->
+                    {% for d in mySearch %}
+                    <!-- diataksi pliroforiwn sta kelia -->
+                    <tr>
+                        {% if d.DepPapous|length > 0 %}
+
+                        <td><strong>{{d.DepPapous}} </strong></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+
+                    {% endif %}
+
+                    {% if d.DepMpampas|length > 0 %}
+                    <td></td>
+                    <td><strong>{{d.DepMpampas}} </strong></td>
+                    <td></td>
+                    </tr>
+
+                    {% endif %}
+
+                    {% if d.DepChild|length > 0 %}
+                    <td></td>
+                    <td><strong> &nbsp&nbsp&nbsp&nbsp{{d.DepChild}} </strong></td>
+                    <td></td>
+                    </tr>
+
+                    {% endif %}
+
+                    {% if d.DepNone|length > 0 %}
+
+                    <td></td>
+                    <td><strong>{{d.DepNone}} </strong></td>
+                    <td></td>
+
+                    </tr>
+                    {% endif %}
+
+                    <tr></tr>
+                    </tr>
+                    {% for row in fullattendaces %}
+
+
+                    {% if row.DepID|floatformat == d.DepID|floatformat  %}
+
+                    <tr>
+                        <td><i>{{row.Role}}</i>:({{row.user_id}}) {{row.first_name}} {{row.last_name}}</td>
+                        <td>{{row.Fattendance_time}}</td>
+                        <td>{{row.Lattendance_time}}</td>
+                        <td>{{row.Hrms}}</td>
+                    </tr>
+                    {% endif %}
+
+                    {% endfor %}
+                    <!-- telos tis for -->
+                    {% endfor %}
+                <!-- {% endfor %} -->
+                {% endif %}
+                {% if noResults %}
+                <p style="margin:20px;">Δεν βρέθηκε τμήμα.</p>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>

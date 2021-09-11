@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8" />
+        <!-- κληρονομεί οτι υπαρχει μεσα στο basic.html -->
+        {% include "basic.html" %}
+
+        <title>Welcome</title>
+
+    </head>
+    
+       
+   
+
+    <body>
+        <!-- ενσωματωση του navbar -->
+        {% include "myNav.html" %}
+        <br>
+        <center>
+            <h2>Σύστημα Διαχείρισης Παρουσιολογίου</h2>
+        </center>
+        <br>
+        {% include "messages.html" %}
+
+        <br>
+        <div class="d-flex justify-content-around">
+            <div class="row">
+                <div class="col-6">
+                    <i style="height: 50%; width:50%;" class="far fa-building"></i>
+                    {{departments}} Τμήματα
+                </div>
+                <div class="col-6">
+                    <i style="height: 50%; width:50%;" class="fas fa-users"></i>
+                    {{users}} Υπάλληλοι
+                </div>
+            </div>
+        </div>
+        <br>
+        <br>
+        <div class="d-flex justify-content-center">
+        <form action="{% url 'SynchronizeAttendances' %}" method="post">
+            <input type="submit" class="btn btn-secondary"
+                value="ΣυγχρονισμόςΠαρουσιών" />
+            {% csrf_token %}
+        </form>
+        </div>
+        
+      
+    </body>
+   
+</html>

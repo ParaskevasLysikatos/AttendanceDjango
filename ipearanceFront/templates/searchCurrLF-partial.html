@@ -1,0 +1,25 @@
+<div id="table" class="row">
+    <div class="col-10">
+        <table class="table table-responsive-md table-hover table-striped">
+            <tbody>
+                {% if mySearch %}
+            <tbody>
+                
+                {% for row in mySearch %}
+                <tr>
+                    <td><i>{{row.Role}}</i>:({{row.user_id}}) {{row.first_name}} {{row.last_name}}</td>
+                    <td>{{row.Fattendance_time}}</td>
+                    <td>{{row.Lattendance_time}}</td>
+                    <td>{{row.Hrms}}</td>
+                </tr>
+
+                {% endfor %}
+                
+                {% endif %}
+                {% if noResults %}
+                <p style="margin:20px;">Δεν βρέθηκε χρήστης.</p>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>

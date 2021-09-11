@@ -1,0 +1,41 @@
+
+ <br>
+{% if mySearch %}
+{% for item in mySearch %}
+<div style="margin-left:200px;font-size:14px;border-style: groove;border-style: groove;border-radius: 25px;width:50%;">
+            <div onmouseover="myPopupO(id={{item.staff_dep_id}})" onmouseleave="myPopupL()" class="row">
+                <div class="row" style="font-size: 12px;margin-right:12px;">
+                  &nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                 &nbsp; {{item.role}}:
+                  {{item.first_name}}
+                  {{item.last_name}}
+                  του
+                  {{item.fathers_name}}
+                </div>
+
+                <div class="row">
+                    <form>
+                        <input type="button" onclick="myFunction(id={{item.staff_dep_id}})"
+                            class="btn btn-primary btn-sm" data-toggle="modal" data-target="#ModalEdit"
+                            value="Επεξεργασία">
+                    </form>
+
+                    <form action="{% url 'staffDelete' %}" method="post">
+                        <input type="hidden" name="staff_dep_id" value={{item.staff_dep_id}} />
+                        <input style="float:right;" type="submit" class="btn btn-danger btn-sm" value="Διαγραφή" />
+                        {% csrf_token %}
+                    </form>
+                </div>
+            </div>
+
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% if noResults %}
+        <p style="margin:20px;">Δεν βρέθηκε προσωπικό.</p>
+        {% endif %}
+
+
+        <br>
+        
+

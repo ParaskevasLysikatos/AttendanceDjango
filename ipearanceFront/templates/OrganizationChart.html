@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8" />
+        <!-- κληρονομεί οτι υπαρχει μεσα στο basic.html -->
+        {% include "basic.html" %}
+
+        <title>OrganizationChart</title>
+    </head>
+
+    <body>
+     <script>
+    $(document).ready(function() {
+    $('#depAdd').select2({
+      theme: "classic",
+      placeholder: 'Select an option'
+      });
+      $('#depMoveF').select2({
+      theme: "classic",
+      placeholder: 'Select an option'
+      });
+      $('#depMoveT').select2({
+      theme: "classic",
+      placeholder: 'Select an option'
+      });
+      $('#depDel').select2({
+      theme: "classic",
+      placeholder: 'Select an option'
+      });
+    });
+      
+
+    </script>
+        <!-- ενσωματωση του navbar -->
+        {% include "myNav.html" %}
+        <br>
+        <div class="container">
+            <p style="padding:5px;" class="border border-secondary"><i class="fas fa-exclamation-circle"></i> &nbsp Το
+                αρχικό τμήμα που ξεκινάει το οργανόγραμμα δεν είναι διαθέσιμο για επεξεργασία.</p>
+        </div>
+        <br>
+        <div style="width:85%;margin-left:10%;" class="container-xxl">
+            <div class="row d-flex justify-content-around">
+
+                <div style="padding:10px;" class="col-3 border border-secondary">
+                    <center>
+                        <h5>Προσθήκη Τμήματος</h5>
+                    </center>
+                    <form action="{% url 'OrganizationChart' %}" method="post">
+                        {% csrf_token %}
+                        <div class="form-row">
+                            <div class="form-group col-11">
+                                <label for="inputState">Όνομα Τμήματος</label>
+                                <input class="form-control" type="text" name="orgAdd_dep" required>
+                            </div>
+                            <div class="form-group col-11">
+                                <label for="inputState">Υποτμήμα του:<p style="font-size:12px;">(μόνο σε Δήμος και Διευθύνσεις)</p></label>
+                                <select id="depAdd" name="orgAdd_mpampas" class="form-control" required>
+                                {% for d in DepartmentsWC %}
+                                    <option value={{d.id}}>{{d.department_name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <center>
+                            <button type="submit" class="btn btn-success">Προσθήκη</button>
+                        </center>
+                    </form>
+                </div>
+
+                <div style="padding:10px;" class="col-4 border border-secondary">
+                    <center>
+                        <h5>Μετακίνηση Τμήματος</h5>
+                    </center>
+                    <form action="{% url 'OrganizationChartMove' %}" method="post">
+                        {% csrf_token %}
+                        <div class="form-row">
+                            <div class="form-group col-md-11">
+                                <label for="inputState">Επιλογή τμήματος προς μετακίνηση:</label>
+                                <select id="depMoveF" name="orgMoveF" class="form-control" required>
+                                {% for d in Departments %}
+                                    <option value={{d.id}}>{{d.department_name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group col-md-11">
+                                <label for="inputState">Μετακίνηση σε: <p style="font-size:12px;">(μόνο σε Δήμος και Διευθύνσεις)</p></label>
+                                 <select id="depMoveT" name="orgMoveT" class="form-control" required>
+                                {% for d in DepartmentsWC %}
+                                    <option value={{d.id}}>{{d.department_name}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <center>
+                            <button type="submit" class="btn btn-primary">Μετακίνηση</button>
+                        </center>
+                    </form>
+                </div>
+
+                <div style="padding:10px;" class="col-4 border border-secondary">
+                    <center>
+                        <h5>Διαγραφή Τμήματος</h5>
+                    </center>
+                    <form action="{% url 'OrganizationChartDel' %}" method="post">
+                        {% csrf_token %}
+                        <div class="form-row">
+                            <div class="form-group col-md-11">
+                                <label for="inputState">Επιλογή τμήματος προς διαγραφή:<p style="font-size:12px;">(μόνο διευθύνσεις χωρίς τμήματα και τμήματα)</p></label>
+                                 <select id="depDel" name="orgDel" class="form-control" required>
+                                {% for d in DepartmentsDel %}
+                                    <option value={{d.DepID}}>{{d.DepToDel}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group col-md-11">
+                            </div>
+                        </div>
+                        <center>
+                            <button type="submit" class="btn btn-danger">Διαγραφή</button>
+                        </center>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+
+        {% include "messages.html" %}
+
+        <div style="padding:10px;" class="container-xl container-fluid border border-secondary">
+            <h2>Οργανόγραμμα</h2>
+
+            <br>
+
+            {% for t in DepartmentsTest %}
+
+            {% comment %} {% if item.department|length > 0 %} {% endcomment %}
+
+
+            {% if t.DepPapous|length > 0 %}
+            <ul class="table-primary">
+                <strong> {{t.DepPapous}} </strong>
+
+            </ul>
+
+            {% endif %}
+            {% if t.DepMpampas|length > 0 %}
+            <ul class="table-secondary">
+                &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;&nbsp;<strong>{{t.DepMpampas}} </strong>
+            </ul>
+
+            {% endif %}
+            {% if t.DepChild|length > 0 %}
+
+            <ul class="table-warning">&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;
+                &nbsp;&nbsp;&nbsp;&nbsp;<strong>{{t.DepChild}}</strong> </ul>
+
+
+            {% endif %}
+        
+            {% endfor %}
+        </div>
+    </body>
+
+</html>

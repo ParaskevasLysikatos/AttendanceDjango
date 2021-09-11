@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8" />
+    <!-- κληρονομεί οτι υπαρχει μεσα στο basic.html -->
+    {% include "basic.html" %} {% load static %}
+    <link rel="stylesheet" href="{% static 'allCss/departments.css' %}" />
+
+    <style type="text/css">
+   
+      @keyframes blinker {
+        from {
+          opacity: 1.0;
+        }
+
+        to {
+          opacity: 0.0;
+        }
+      }
+
+      .blink {
+        text-decoration: blink;
+        animation-name: blinker;
+        animation-duration: 0.6s;
+        animation-iteration-count: infinite;
+        animation-timing-function: ease-in-out;
+        animation-direction: alternate;
+      }
+    
+      #timepicker3 {
+        z-index: 9999999;
+      }
+
+      #pop {
+        display: none;
+        position: fixed;
+        z-index: 99999;
+        padding: 10px;
+        background-color: #F5F5F5;
+        border: 1px solid #080808;
+        -moz-border-radius: 20px;
+        -webkit-border-radius: 20px;
+        margin: 10px;
+        -webkit-box-shadow: 0px 0px 5px 0px rgba(164, 164, 164, 1);
+        box-shadow: 0px 0px 5px 0px rgba(164, 164, 164, 1);
+        top: 50%;
+        left: 70%;
+      }
+
+      #spastoStart {
+        display: none;
+      }
+
+      #spastoEnd {
+        display: none;
+      }
+
+      #spastoStart2 {
+        display: none;
+      }
+
+      #spastoEnd2 {
+        display: none;
+      }
+
+    </style>
+    <title>Departments</title>
+  </head>
+
+  <body>
+
+    <script>
+      $(document).ready(function () {
+        $('#depAdd').select2({
+          theme: "classic",
+          placeholder: 'Select an option'
+        });
+        $('#userAdd').select2({
+          theme: "classic",
+          placeholder: 'Select an option'
+        });
+      });
+      $(document).ready(function () {
+        $('#timepicker1').timepicker({
+          timeFormat: 'HH:mm',
+          interval: 30,
+          defaultTime: '{{generalWRF|date:"H:i"}}',
+          dynamic: true,
+          dropdown: true,
+          scrollbar: true,
+          use24hours: true
+        });
+        $('#timepicker2').timepicker({
+          timeFormat: 'HH:mm',
+          interval: 30,
+          defaultTime: '{{generalWRT|date:"H:i"}}',
+          dynamic: true,
+          dropdown: true,
+          scrollbar: true,
+          use24hours: true
+        });
+
+        $('#timepicker5').timepicker({
+          timeFormat: 'HH:mm',
+          interval: 30,
+          defaultTime: '15',
+          dynamic: true,
+          dropdown: true,
+          scrollbar: true,
+          use24hours: true
+        });
+        $('#timepicker6').timepicker({
+          timeFormat: 'HH:mm',
+          interval: 30,
+          defaultTime: '21',
+          dynamic: true,
+          dropdown: true,
+          scrollbar: true,
+          use24hours: true
+        });
+
+      });
+
+    </script>
+    <!-- ενσωματωση του navbar -->
+    {% include "myNav.html" %}
+    <div class="container-xl container-fluid">
+      <br>
+      <h2>Τμηματοποίηση Προσωπικού</h2>
+      <br>
+      <p style="padding:5px;" class="border border-secondary"><i class="fas fa-exclamation-circle"></i> &nbsp Ο κάθε
+        χρήστης μπορεί να ανήκει μέχρι σε ένα τμήμα σε μοναδικό κλειστό διάστημα</p>
+      <br>
+      <form action="{% url 'staffAdd' %}" method="post" class="border border-secondary">
+        {% csrf_token %}
+        <div class="form-row">
+          <div class="form-group col-md-4">
+            <label for="depAdd">Επιλογή τμήματος</label>
+            <select id="depAdd" name="dep_id" class="form-control">
+              {% for d in departments %}
+              <option value={{d.id}}>{{d.department_name}}</option>
+
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group col-md-4">
+            <label for="userAdd">Επιλογή προσωπικού</label>
+            <select id="userAdd" name="user_device_card_number" class="form-control">
+              {% for item in users %}
+              <option value={{item.device_card_number}}>{{item.first_name}} {{item.last_name}} {{item.device_card_number}}
+                {{item.email}}</option>
+
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group col-md-4">
+            <label for="inputState">Επιλογή Ρόλου</label>
+            <select id="inputState" name="role" class="form-control">
+              {% for r in Roles %}
+              <option value={{r.id}}>{{r.role_name}}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="inputState">Ισχύει Από (κενό:σήμερα)</label>
+            <input class="form-control" type="date" name="applyF">
+          </div>
+
+          <div class="form-group col-md-6">
+            <label for="inputState"> Ισχύει Εώς (κενό:50 χρόνια)</label>
+            <input class="form-control" type="date" min="{{myDate}}" name="applyT">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="inputState">Έναρξη ωραρίου</label>
+            <input class="form-control" type="text" id="timepicker1" value="" name="startW" required>
+          </div>
+
+          <div class="form-group col-md-6">
+            <label for="inputState">Λήξη ωραρίου</label>
+            <input class="form-control" type="text" id="timepicker2" value="" name="endW" required>
+          </div>
+        </div>
+
+        <div class="form-row d-flex justify-content-around">
+          <div class="form-check col-md-3">
+            <input class="form-check-input" type="checkbox" onclick="mySpasto()" name="spasto" value='1'>
+            <label class="form-check-label" for="flexCheckChecked">
+              Σπαστό/Διακοπτόμενο Ωράριο
+            </label>
+          </div>
+
+          <div id="spastoStart" class="form-group col-md-3">
+            <label for="inputState">Έναρξη ωραρίου 2</label>
+            <input class="form-control" type="text" id="timepicker5" value="" name="startW2" required>
+          </div>
+          <div id="spastoEnd" class="form-group col-md-3">
+            <label for="inputState">Λήξη ωραρίου 2</label>
+            <input class="form-control" type="text" id="timepicker6" value="" name="endW2" required>
+          </div>
+
+        </div>
+
+        <label for="inputState">Ημέρες Εργασίας</label>
+        <div class="border border-top  d-flex justify-content-around">
+          <br>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="monday" value='1' id="flexCheckChecked" checked>
+            <label class="form-check-label" for="flexCheckChecked">
+              Δευτέρα
+            </label>
+          </div>
+
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="tuesday" value='1' id="flexCheckChecked" checked>
+            <label class="form-check-label" for="flexCheckChecked">
+              Τρίτη
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="wednesday" value='1' id="flexCheckChecked" checked>
+            <label class="form-check-label" for="flexCheckChecked">
+              Τετάρτη
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="thursday" value='1' id="flexCheckChecked" checked>
+            <label class="form-check-label" for="flexCheckChecked">
+              Πέμπτη
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="friday" value='1' id="flexCheckChecked" checked>
+            <label class="form-check-label" for="flexCheckChecked">
+              Παρασκευή
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="saturday" value='1' id="flexCheckChecked">
+            <label class="form-check-label" for="flexCheckChecked">
+              Σάββατο
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="sunday" value='1' id="flexCheckChecked">
+            <label class="form-check-label" for="flexCheckChecked">
+              Κυριακή
+            </label>
+          </div>
+        </div>
+
+
+
+        <br>
+        <div class="d-flex justify-content-center">
+          <button type="submit" class="btn btn-success">Προσθήκη</button>
+        </div>
+      </form>
+      {% include "messages.html" %}
+      
+      <br>
+      <div class="row d-flex justify-content-center">
+        <div style="margin-left:20px;" class=" form-group col-md-4">
+          <input id="depInfo-input" class="form-control" placeholder="Αναζήτιση προσωπικού με Όνομα/Επώνυμο">
+        </div>
+        <div id="search-icon" class=" form-group col-md-1">
+          <i class="fa fa-search"></i>
+        </div>
+      </div>
+
+      <div style="margin-left:20px;" id="replaceable-content">
+        {% include "searchDepInfo-partial.html" %}
+      </div>
+      <br>
+      
+      
+      <h2>Οργανόγραμμα</h2>
+
+      <br>
+
+      {% for t in Test %}
+
+      {% comment %} {% if item.department|length > 0 %} {% endcomment %}
+
+
+      {% if t.DepPapous|length > 0 %}
+      <ul class="table-primary">
+        <strong> {{t.DepPapous}} </strong>
+
+      </ul>
+
+      {% endif %}
+      {% if t.DepMpampas|length > 0 %}
+      <ul class="table-secondary">
+        &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;<strong>{{t.DepMpampas}} </strong>
+      </ul>
+
+      {% endif %}
+      {% if t.DepChild|length > 0 %}
+
+      <ul class="table-warning">&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;<strong>{{t.DepChild}}</strong> </ul>
+
+
+      {% endif %}
+
+      {% for item in theList %}
+      {% if  item.first_name|length > 0 and item.DepID|floatformat == t.DepID|floatformat %}
+
+      {% if t.DepPapous|length > 0 %}
+      <ol style="font-size:14px;border-style: groove;border-radius: 25px;width:50%;">
+
+        {% endif %}
+
+        {% if  t.DepMpampas|length > 0 %}
+        <ol style="margin-left:250px;font-size:14px;border-style: groove;border-radius: 25px;width:50%;">
+
+
+          {% endif %}
+
+          {% if t.DepChild|length > 0 %}
+          <ol style="margin-left:500px;font-size:14px;border-style: groove;border-radius: 25px;width:50%;">
+
+
+            {% endif %}
+
+            <div onmouseover="myPopupO(id={{item.staff_dep_id}})" onmouseleave="myPopupL()" class="row">
+              <div class="row" style="font-size: 12px;margin-right:12px;">
+                {{item.role}}: {{item.first_name}} {{item.last_name}} του {{item.fathers_name}}
+              </div>
+              
+              <div class="row">
+                <form>
+                  <input type="button" onclick="myFunction(id={{item.staff_dep_id}})" class="btn btn-primary btn-sm"
+                    data-toggle="modal" data-target="#ModalEdit" value="Επεξεργασία">
+                </form>
+
+                <form action="{% url 'staffDelete' %}" method="post">
+                  <input type="hidden" name="staff_dep_id" value={{item.staff_dep_id}} />
+                  <input style="float:right;" type="submit" class="btn btn-danger btn-sm" value="Διαγραφή" />
+                  {% csrf_token %}
+                </form>
+              </div>
+            </div>
+
+
+
+            {% endif %}
+          </ol>
+
+          {% endfor %}
+          {% endfor %}
+
+
+          <br>
+    </div>
+
+    <div id="pop">
+      <p id="range-name"></p>
+      <p id="range-date"></p>
+      <p id="range-time"></p>
+      <p id="range-day"></p>
+      <p id="range-spasto"></p>
+    </div>
+
+
+
+    <!-- Modal for edit-->
+    <div class="modal fade bd-example-modal-xl" id="ModalEdit" tabindex="-1" role="dialog"
+      aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Επεξεργασία για τμηματοποίηση προσωπικού </h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div id="edit">
+              <form class="form-horizontal" action="{% url 'staffEdit'%}" method="post" autocomplete="off">
+                {% csrf_token %}
+
+                <div class="form-row">
+
+                  <div class="form-group col-md-4">
+                    <label for="inputState">Επιλογή τμήματος</label>
+                    <select id="inputState" name="dep_id" class="form-control">
+
+                      <option id="depEdit" selected></option>
+                      {% for d in departments %}
+                      <option value={{d.id}}>{{d.department_name}}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <div class="form-group col-md-4">
+                    <label for="inputState">Επιλογή προσωπικού</label>
+                    <select id="inputState" name="user_card_number" class="form-control">
+
+                      <option id="userEdit" selected></option>
+                      {% for item in users %}
+                      <option value={{item.device_card_number}}>{{item.first_name}} {{item.last_name}} {{item.email}}
+                      </option>
+                      {% endfor %}
+                    </select>
+
+                  </div>
+                  <div class="form-group col-md-4">
+                    <label for="inputState">Επιλογή Ρόλου</label>
+                    <select id="inputState" name="role" class="form-control">
+
+                      <option id="roleEdit" selected></option>
+                      {% for r in Roles %}
+                      <option value={{r.id}}>{{r.role_name}}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group col-md-6">
+                    <label for="inputState">Ισχύει Από</label>
+                    <input class="form-control" id="applyFEdit" type="date" name="applyF" required>
+                  </div>
+
+                  <div class="form-group col-md-6">
+                    <label for="inputState"> Ισχύει Εώς</label>
+                    <input class="form-control" id="applyTEdit" type="date" name="applyT" required>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group col-md-6">
+                    <label for="inputState">Έναρξη ωραρίου</label>
+                    <input class="form-control" type="text" id="timepicker3" name="startW" required>
+                  </div>
+
+                  <div class="form-group col-md-6">
+                    <label for="inputState">Λήξη ωραρίου</label>
+                    <input class="form-control" type="text" id="timepicker4" name="endW" required>
+                  </div>
+                </div>
+
+                <div class="form-row d-flex justify-content-around">
+                  <div class="form-check col-md-3">
+                    <input class="form-check-input" type="checkbox" onclick="mySpasto2()" name="spasto" value='1'
+                      id="spastoEdit">
+                    <label class="form-check-label" for="flexCheckChecked">
+                      Σπαστό/Διακοπτόμενο Ωράριο
+                    </label>
+                  </div>
+
+                  <div id="spastoStart2" class="form-group col-md-3">
+                    <label for="inputState">Έναρξη ωραρίου 2</label>
+                    <input class="form-control" type="text" id="timepicker7" name="startW2" required>
+                  </div>
+                  <div id="spastoEnd2" class="form-group col-md-3">
+                    <label for="inputState">Λήξη ωραρίου 2</label>
+                    <input class="form-control" type="text" id="timepicker8" name="endW2" required>
+                  </div>
+
+                </div>
+
+                <label for="inputState">Ημέρες Εργασίας</label>
+                <div class="border border-top  d-flex justify-content-around">
+                  <br>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="monday" value='1' id="mondayEdit">
+                    <label class="form-check-label" for="flexCheckChecked">
+                      Δευτέρα
+                    </label>
+                  </div>
+
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="tuesday" value='1' id="tuesdayEdit">
+                    <label class="form-check-label" for="flexCheckChecked">
+                      Τρίτη
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="wednesday" value='1' id="wednesdayEdit">
+                    <label class="form-check-label" for="flexCheckChecked">
+                      Τετάρτη
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="thursday" value='1' id="thursdayEdit">
+                    <label class="form-check-label" for="flexCheckChecked">
+                      Πέμπτη
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="friday" value='1' id="fridayEdit">
+                    <label class="form-check-label" for="flexCheckChecked">
+                      Παρασκευή
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="saturday" value='1' id="saturdayEdit">
+                    <label class="form-check-label" for="flexCheckChecked">
+                      Σάββατο
+                    </label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="sunday" value='1' id="sundayEdit">
+                    <label class="form-check-label" for="flexCheckChecked">
+                      Κυριακή
+                    </label>
+                  </div>
+                </div>
+                <input type="hidden" name="staff_dep_id" id="work_date_idEdit">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Αποθήκευση</button>
+          </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+
+    <script>
+      //var spasto=false;
+      function mySpasto() {
+        $('#spastoStart').toggle();
+        $('#spastoEnd').toggle();
+      }
+
+      function mySpasto2() {
+        $('#spastoStart2').toggle();
+        $('#spastoEnd2').toggle();
+      }
+
+      function myPopupO(id) {
+        $('#pop').fadeIn();
+        myFunction(id);
+      }
+
+      function myPopupL() {
+        $('#pop').fadeOut();
+
+      }
+
+
+
+
+      function myFunction(
+        id
+      ) { // ajax to perform get request to get the string object based on id, which is printed inside the function of button epeksergasia
+
+        ajaxObject = $.ajax({
+          method: 'GET',
+          url: "staffGet/" + id,
+          contentType: 'application/json',
+          success: function (response) {
+            console.log(response);
+            //var mySplit=response.split(',');// to have access as an array of the response to distribute to input fields the values
+            $("#work_date_idEdit").val(id); // we pass it to hidden field of edit form
+
+            $("#depEdit").val(response.dep_id);
+            $("#depEdit").text(response.department);
+
+            $("#userEdit").val(response.user_card_number);
+            $("#userEdit").text(response.last_name + " " + response.first_name + " " + response.email);
+
+            $("#roleEdit").text(response.role);
+
+            $("#work_date_idEdit").val(response.work_date_id);
+
+            $("#applyFEdit").val(response.applyF);
+            console.log(response.applyF)
+            $("#applyTEdit").val(response.applyT);
+              console.log(response.applyT)
+            //$("#startWEdit").text(response.startW);
+            //$("#endWEdit").text(response.endW);
+            $('#timepicker3').timepicker({
+              timeFormat: 'HH:mm',
+              interval: 30,
+              defaultTime: response.startW,
+              dynamic: true,
+              dropdown: true,
+              scrollbar: true,
+              use24hours: true,
+              zindex: 1000000,
+            });
+            $("#timepicker3").timepicker('setTime', response.startW);
+
+            $('#timepicker4').timepicker({
+              timeFormat: 'HH:mm',
+              interval: 30,
+              defaultTime: response.endW,
+              dynamic: true,
+              dropdown: true,
+              scrollbar: true,
+              use24hours: true,
+              zindex: 1000000,
+            });
+            $("#timepicker4").timepicker('setTime', response.endW);
+            //$("#mondayEdit").text(response.monday);
+            //$("#tuesdayEdit").text(response.tuesday);
+            //$("#wednesdayEdit").text(response.wednesday);
+            //$("#thursdayEdit").text(response.thursday);
+            //$("#fridayEdit").text(response.friday);
+            //$("#saturdayEdit").text(response.saturday);
+            //$("#sundayEdit").text(response.sunday);
+            var monday = '';
+            var tuesday = '';
+            var wednesday = '';
+            var tuesday = '';
+            var thursday = '';
+            var friday = '';
+            var saturday = '';
+            var sunday = '';
+            var spastoPop = 'Όχι'
+
+
+            if (response.monday == true) {
+              $('#mondayEdit').prop('checked', true);
+              monday = '-Δευτέρα';
+            } else {
+              $('#mondayEdit').prop('checked', false);
+            }
+
+            if (response.tuesday == true) {
+              $('#tuesdayEdit').prop('checked', true);
+              tuesday = '-Τρίτη';
+            } else {
+              $('#tuesdayEdit').prop('checked', false);
+            }
+
+            if (response.wednesday == true) {
+              $('#wednesdayEdit').prop('checked', true);
+              wednesday = '-Τετάρτη';
+            } else {
+              $('#wednesdayEdit').prop('checked', false);
+            }
+
+            if (response.thursday == true) {
+              $('#thursdayEdit').prop('checked', true);
+              thursday = '-Πέμπτη';
+            } else {
+              $('#thursdayEdit').prop('checked', false);
+            }
+
+            if (response.friday == true) {
+              $('#fridayEdit').prop('checked', true);
+              friday = '-Παρασκευή';
+            } else {
+              $('#fridayEdit').prop('checked', false);
+            }
+
+            if (response.saturday == true) {
+              $('#saturdayEdit').prop('checked', true);
+              saturday = '-Σάββατο';
+            } else {
+              $('#saturdayEdit').prop('checked', false);
+            }
+
+            if (response.sunday == true) {
+              $('#sundayEdit').prop('checked', true);
+              sunday = '-Κυριακή';
+            } else {
+              $('#sundayEdit').prop('checked', false);
+            }
+            var tempStartW2
+            var tempEndW2
+            if (response.spasto == true) {
+              $('#spastoEdit').prop('checked', true);
+              //spasto=true;
+              spastoPop = 'Ναι'
+              tempStartW2 = response.startW2
+              tempEndW2 = response.endW2
+              $('#spastoStart2').show();
+              $('#spastoEnd2').show();
+              $('#timepicker7').timepicker({
+                timeFormat: 'HH:mm',
+                interval: 30,
+                defaultTime: response.startW2,
+                dynamic: true,
+                dropdown: true,
+                scrollbar: true,
+                use24hours: true,
+                zindex: 1000000,
+              });
+              $('#timepicker8').timepicker({
+                timeFormat: 'HH:mm',
+                interval: 30,
+                defaultTime: response.endW2,
+                dynamic: true,
+                dropdown: true,
+                scrollbar: true,
+                use24hours: true,
+                zindex: 1000000,
+              });
+              $("#timepicker7").timepicker('setTime', response.startW2);
+              $("#timepicker8").timepicker('setTime', response.endW2);
+            } else {
+              $('#spastoEdit').prop('checked', false);
+              $('#spastoStart2').hide();
+              $('#spastoEnd2').hide();
+              $('#timepicker7').timepicker({
+                timeFormat: 'HH:mm',
+                interval: 30,
+                defaultTime: '15',
+                dynamic: true,
+                dropdown: true,
+                scrollbar: true,
+                use24hours: true,
+                zindex: 1000000,
+              });
+              $('#timepicker8').timepicker({
+                timeFormat: 'HH:mm',
+                interval: 30,
+                defaultTime: '21',
+                dynamic: true,
+                dropdown: true,
+                scrollbar: true,
+                use24hours: true,
+                zindex: 1000000,
+              });
+              //spasto=false;
+              spastoPop = 'Όχι'
+              tempStartW2 = ''
+              tempEndW2 = ''
+            }
+            //for myPopup
+            $("#range-name").text('Ονομ/Επ: ' + response.last_name + " " + response.first_name + " του " + response
+              .fathers_name);
+            $("#range-date").text('Ισχύς: ' + response.applyF_f + '----' + response.applyT_f);
+            $("#range-time").text('Ωράριο: ' + response.startW + ' ---- ' + response.endW);
+            $("#range-day").text('Ημέρες: ' + monday + '\n' + tuesday + '\n' + wednesday + '\n' + thursday +
+              '\n' + friday + '\n' + saturday + '\n' + sunday);
+            $("#range-spasto").text('Σπαστό Ωράριο:' + spastoPop + '\n' + tempStartW2 + '----' + tempEndW2);
+
+          },
+          // Check for existence of file 
+          error: function (err) {
+            console.log(err);
+          }
+        });
+      }
+
+    </script>
+    
+     <script>
+       const depInfo_input = $("#depInfo-input")
+       const search_icon = $('#search-icon')
+       const search_div = $('#replaceable-content')
+       const endpoint = 'depInfoSearch'
+       const delay_by_in_ms = 700
+       let scheduled_function = false
+
+       let ajax_call = function (endpoint, request_parameters) {
+         $.getJSON(endpoint, request_parameters)
+           .done(response => {
+             // fade out the artists_div, then:
+             search_div.fadeTo('slow', 0).promise().then(() => {
+               // replace the HTML contents
+               search_div.html(response['html_from_view'])
+               // fade-in the div with new contents
+               search_div.fadeTo('slow', 1)
+               // stop animating search icon
+               search_icon.removeClass('blink')
+             })
+           })
+       }
+
+
+       depInfo_input.on('keyup', function () {
+
+         const request_parameters = {
+           q: $(this).val() // value of user_input: the HTML element with ID user-input
+         }
+
+         // start animating the search icon with the CSS class
+         search_icon.addClass('blink')
+
+         // if scheduled_function is NOT false, cancel the execution of the function
+         if (scheduled_function) {
+           clearTimeout(scheduled_function)
+         }
+
+         // setTimeout returns the ID of the function to be executed
+         scheduled_function = setTimeout(ajax_call, delay_by_in_ms, endpoint, request_parameters)
+       })
+     </script>
+    
+    
+    
+  </body>
+
+</html>

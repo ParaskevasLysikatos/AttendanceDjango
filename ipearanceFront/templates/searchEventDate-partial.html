@@ -1,0 +1,23 @@
+ <div id="table" class="row">
+     <div class="col-10">
+         <table class="table table-responsive-md table-hover table-striped">
+             <tbody>
+                 {% if mySearch %}
+                 {% for item in mySearch %}
+                 <tr>
+                     <td>{{item.id}}</td>
+                     <td>{{item.username}}/{{item.staff_card}}</td>
+                     <td>{{item.function_event}}</td>
+                     <td>{{item.function_used_info}}</td>
+                     <td>{{item.created_date|date:"D d M Y-H:i:s"}}</td>
+
+                 </tr>
+                 {% endfor %}
+                 {% endif %}
+                 {% if noResults %}
+                 <p style="margin:20px;">Δεν βρέθηκαν συμβάντα.</p>
+                 {% endif %}
+             </tbody>
+         </table>
+     </div>
+ </div>

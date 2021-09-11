@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8" />
+    {% include "basic.html" %} {% load static %}
+    <link rel="stylesheet" href="{% static 'allCss/login.css' %}" />
+    <title>Login</title>
+  </head>
+
+  <body>
+
+    <h1>Καλώς ήρθατε, Login</h1>
+    <h4 style="display:flex;justify-content:center;margin:2%;">Παρουσιολόγιο (Attendance-Django)</h4>
+    <div class="d-flex justify-content-center">
+      <form action="{% url 'pagelogin' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.GET.next }}" />
+        <div class="form-outline mb-2">
+          <label for="exampleInputEmail1">Username</label>
+          <input type="text" class="form-control" name="username" aria-describedby="emailHelp"
+            placeholder="Enter username" required>
+        </div>
+        <div class="form-outline mb-2">
+          <label for="exampleInputPassword1">Password</label>
+          <input type="password" class="form-control" name="password" placeholder="Password" required>
+        </div>
+        <div>
+         <label style="font-size:12px;" for="exampleInputEmail1">(Πατήστε το κουμπί SynchronizeAttendances για συγρονισμό παρουσιών στην επόμενη σελίδα)(admin-123)(use google translate extension for non greek users)</label>
+          <button type="submit" class="btn btn-primary btn-block mb-2">Sign in</button>
+        </div>
+
+      </form>
+    </div>
+    {% include "messages.html" %} {% comment %} to display success or error messages {% endcomment %}
+  </body>
+
+</html>

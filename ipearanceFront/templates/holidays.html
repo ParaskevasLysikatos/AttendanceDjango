@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8" />
+    <!-- κληρονομεί οτι υπαρχει μεσα στο basic.html -->
+    {% include "basic.html" %} 
+    
+    <title>holidays</title>
+     <style>
+      @keyframes blinker {
+        from {
+          opacity: 1.0;
+        }
+
+        to {
+          opacity: 0.0;
+        }
+      }
+
+      .blink {
+        text-decoration: blink;
+        animation-name: blinker;
+        animation-duration: 0.6s;
+        animation-iteration-count: infinite;
+        animation-timing-function: ease-in-out;
+        animation-direction: alternate;
+      }
+
+    </style>
+  </head>
+
+  <body>
+    <!-- ενσωματωση του navbar -->
+    {% include "myNav.html" %}
+     <br>
+     <center>
+     <h2>Αργίες</h2>
+     </center>
+     <br>
+    <div style="padding:10px;width:60%;" class="container border border-secondary">
+     <center>
+     <h5>Προσθήκη αργίας</h5>
+     </center>
+      <form action="{% url 'holiday' %}" method="post">
+        {% csrf_token %}
+            <div class="form-row">
+             <div class="form-group col-md-4">
+            <label for="inputState">Περιγραφή</label>
+            <input class="form-control"  type="text"  name="holi_desc" required>
+          </div>
+          <div class="form-group col-md-4">
+            <label for="inputState">Ημέρα αργίας από</label>
+            <input class="form-control"  type="date"  name="holi_datef" required>
+          </div>
+          <div class="form-group col-md-4">
+            <label for="inputState">Ημέρα αργίας εώς</label>
+            <input class="form-control"  type="date"  name="holi_datet" required>
+          </div>
+        </div>
+  <center>
+  <button type="submit" class="btn btn-primary">Αποθήκευση</button>
+  </center>
+</form>
+
+    </div>
+
+   {% include "messages.html" %}
+   
+    
+    <div style="padding:10px;width:60%;" class="container border border-secondary">
+     <div class="row d-flex justify-content-around">
+   <form class="col-4" action="{% url 'holidayCurrentYear' %}" method="post">
+        <label for="inputState">Προσθήκη αργιών για το τρέχον έτος</label>
+          <input type="submit" class="btn btn-secondary"
+            value="Προσθήκη Αργιών Αυτόματα, τρέχον" />
+          {% csrf_token %}
+        </form>
+        
+        <form class="col-4" action="{% url 'holidayNextYear' %}" method="post">
+          <label for="inputState">Προσθήκη αργιών για το επόμενο έτος</label>
+          <input style="margin-left:10px;" style="float: right;" type="submit" class="btn btn-warning"
+            value="Προσθήκη Αργιών Αυτόματα, επόμενο" />
+          {% csrf_token %}
+        </form>
+        </div>
+        </div>
+   <br>
+      <div class="row d-flex justify-content-center">
+        <div style="margin-left:20px;" class=" form-group col-md-3">
+          <input id="holiday-input" class="form-control" placeholder="Αναζήτιση αργιών με περιγραφή">
+        </div>
+        <div id="search-icon" class=" form-group col-md-1">
+          <i  class="fa fa-search"></i>
+        </div>
+        
+        <div style="margin-left:20px;" class=" form-group col-md-2">
+          <input id="holidayDate-input" type="date" class="form-control" placeholder="Αναζήτιση αργιών με ημερομηνία από">
+        </div>
+        <div id="search-iconD" class=" form-group col-md-1">
+          <i class="fa fa-search"></i>
+        </div>
+      </div>
+
+      <div style="margin-left:20px;" id="replaceable-content">
+        {% include "searchHoliday-partial.html" %}
+      </div>
+      <div style="margin-left:20px;" id="replaceable-content2">
+        {% include "searchHolidayDate-partial.html" %}
+      </div>
+      <br> 
+   <div style="padding:10px;width:60%;" class="container border border-secondary">
+     <center>
+     <h5>Αργίες Προσωπικού</h5>
+     </center>
+   <table class="table table-responsive-md table-hover table-striped">
+        <thead class="table-warning">
+          <tr class="">
+            <th>A/A</th>
+            <th>Περιγραφή</th>
+            <th>Ημέρα αργίας από</th>
+            <th>Ημέρα αργίας εώς</th>
+            <th>Ενέργειες</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          {% for item in Holidays %}
+          <tr>
+            <td>{{item.id}}</td>
+            <td>{{item.description}}</td>
+            <td>{{item.date_from|date:"d/m/Y"}}</td>
+            <td>{{item.date_to|date:"d/m/Y"}}</td>
+            <td>
+              <div class="row">
+                <form action="{% url 'holidayDelete' %}" method="post">
+                  <input type="hidden" name="id_holi" value="{{item.id}}" />
+                  <input style="float: right;" type="submit" class="btn btn-danger" value="Διαγραφή" />
+                  {% csrf_token %}
+                </form>
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <button type="button" onclick="myFunction(id={{item.id}})" class="btn btn-primary" data-toggle="modal"
+                  data-target="#ModalEdit">
+                  Επεξεργασία
+                </button>
+                <div>
+            </td>
+
+          </tr>
+          {% endfor %}
+
+        </tbody>
+      </table>
+      <br>
+      <div class="d-flex justify-content-center">
+      {% if Holidays.has_other_pages %}
+      <ul class="pagination pagination-lg ">
+        {% if Holidays.has_previous %}
+        <li class="page-item"><a class="page-link" href="?page={{ Holidays.previous_page_number }}">&laquo;</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled"><span>&laquo;</span></li>
+        {% endif %}
+        {% for i in Holidays.paginator.page_range %}
+        {% if Holidays.number == i %}
+        <li class="page-item active"><span class="page-link">{{ i }} <span class="sr-only">(current)</span></span>
+        </li>
+
+        {% elif i > Holidays.number|add:'-3' and i < Holidays.number|add:'3' %}
+        <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+
+        {% endif %}
+
+        {% if  Holidays.number|add:'3' == i %}
+        <li class="page-item"><a class="page-link">⋯</a></li>
+        <li class="page-item"><a class="page-link"
+            href="?page={{Holidays.paginator.num_pages}}">{{Holidays.paginator.num_pages }}</a></li>
+        {% endif %}
+
+        {% if  Holidays.number|add:'-3' == i %}
+        <li class="page-item"><a class="page-link" href="?page={{1}}">{{1}}</a></li>
+        <li class="page-item"><a class="page-link">⋯</a></li>
+        {% endif %}
+        {% comment %} {% else %}
+        <li class="page-item"><a class="page-link" href="?pageA={{ i }}">{{ i }}</a></li>
+        {% endif %} {% endcomment %}
+        {% endfor %}
+        {% if Holidays.has_next %}
+        <li class="page-item"><a class="page-link" href="?page={{ Holidays.next_page_number }}">&raquo;</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled"><span>&raquo;</span></li>
+        {% endif %}
+      </ul>
+      {% endif %}
+    </div>
+    <br>
+
+    </div>
+    
+    <!-- Modal for edit-->
+    <div class="modal fade" id="ModalEdit" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog  modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Επεξεργασία Aργίας</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div id="edit">
+              <form class="form-horizontal" action="{% url 'holidayEdit'%}" method="post" autocomplete="off">
+                {% csrf_token %}
+                <div class="form-group" id="editForFind">
+                  <div class="form-row">
+                    <div class="form-group col-md-7">
+                      <label for="inputState">Όνομα Αργίας</label>
+                      <input id="holidayNameEdit" class="form-control" type="text" name="name_holiday" required>
+                       <label for="inputState">Ημέρα αργίας από</label>
+                       <input id="holidayFrom" class="form-control" type="date" name="from" required>
+                        <label for="inputState">Ημέρα αργίας εώς</label>
+                        <input id="holidayTo" class="form-control" type="date" name="to" required>
+                    </div>
+                  </div>
+                </div>
+                <input type="hidden" name="id" id="passEditId">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <div style="margin-right:30%;">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Κλείσιμο</button>
+              <button type="submit" class="btn btn-primary">Αποθήκευση</button>
+            </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+    
+  </body>
+  <script>
+   function myFunction(
+   id
+   ) { // ajax to perform get request to get the string object based on id, which is printed inside the function of
+   //button epeksergasia
+   console.log(id)
+   ajaxObject = $.ajax({
+   method: 'GET',
+   url: "holidayGet/" + id,
+   contentType: 'application/json',
+   success: function (response) {
+   console.log(response);
+   var mySplit = response.split(
+   ',');
+   console.log(mySplit);
+   $("#passEditId").val(id); // we pass it to hidden field of edit form
+
+   var role = $("#holidayNameEdit").val(mySplit[2]);
+   var role = $("#holidayFrom").val(mySplit[0]);
+   var role = $("#holidayTo").val(mySplit[1]);
+
+   },
+   // Check for existence of file
+   error: function (err) {
+   console.log(err);
+   }
+   });
+   }
+  
+  
+  
+  
+  
+  
+  
+  
+    const holiday_input = $("#holiday-input")
+    const search_icon = $('#search-icon')
+    const search_div = $('#replaceable-content')
+    const endpoint = 'holidaySearch'
+    const delay_by_in_ms = 700
+    let scheduled_function = false
+
+    let ajax_call = function (endpoint, request_parameters) {
+      $.getJSON(endpoint, request_parameters)
+        .done(response => {
+          // fade out the artists_div, then:
+          search_div.fadeTo('slow', 0).promise().then(() => {
+            // replace the HTML contents
+            search_div.html(response['html_from_view'])
+            // fade-in the div with new contents
+            search_div.fadeTo('slow', 1)
+            // stop animating search icon
+            search_icon.removeClass('blink')
+          })
+        })
+    }
+
+
+    holiday_input.on('keyup', function () {
+
+      const request_parameters = {
+        q: $(this).val() // value of user_input: the HTML element with ID user-input
+      }
+
+      // start animating the search icon with the CSS class
+      search_icon.addClass('blink')
+
+      // if scheduled_function is NOT false, cancel the execution of the function
+      if (scheduled_function) {
+        clearTimeout(scheduled_function)
+      }
+
+      // setTimeout returns the ID of the function to be executed
+      scheduled_function = setTimeout(ajax_call, delay_by_in_ms, endpoint, request_parameters)
+    })
+
+  </script>
+  
+  
+  <script>
+    const holidayDate_input = $("#holidayDate-input")
+    const search_iconD = $('#search-iconD')
+    const search_div2 = $('#replaceable-content2')
+    const endpoint2 = 'holidayDateSearch'
+    const delay_by_in_ms2 = 700
+    let scheduled_function2 = false
+
+    let ajax_call2 = function (endpoint2, request_parameters2) {
+      $.getJSON(endpoint2, request_parameters2)
+        .done(response => {
+          // fade out the artists_div, then:
+          search_div2.fadeTo('slow', 0).promise().then(() => {
+            // replace the HTML contents
+            search_div2.html(response['html_from_view'])
+            // fade-in the div with new contents
+            search_div2.fadeTo('slow', 1)
+            // stop animating search icon
+            search_iconD.removeClass('blink')
+          })
+        })
+    }
+
+
+    holidayDate_input.on('change', function () {
+
+      const request_parameters2 = {
+        q: $(this).val() // value of user_input: the HTML element with ID user-input
+      }
+
+      // start animating the search icon with the CSS class
+      search_iconD.addClass('blink')
+
+      // if scheduled_function is NOT false, cancel the execution of the function
+      if (scheduled_function2) {
+        clearTimeout(scheduled_function2)
+      }
+
+      // setTimeout returns the ID of the function to be executed
+      scheduled_function = setTimeout(ajax_call2, delay_by_in_ms2, endpoint2, request_parameters2)
+    })
+  </script>
+
+</html>

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8" />
+    <!-- κληρονομεί οτι υπαρχει μεσα στο basic.html -->
+    {% include "basic.html" %} {% load static %}
+    <link rel="stylesheet" href="{% static 'allCss/deviceSelect.css' %}" />
+    <title>Device Select</title>
+    <style>
+      @keyframes blinker {
+        from {
+          opacity: 1.0;
+        }
+
+        to {
+          opacity: 0.0;
+        }
+      }
+
+      .blink {
+        text-decoration: blink;
+        animation-name: blinker;
+        animation-duration: 0.6s;
+        animation-iteration-count: infinite;
+        animation-timing-function: ease-in-out;
+        animation-direction: alternate;
+      }
+
+    </style>
+  </head>
+
+  <body>
+    <!-- ενσωματωση του navbar -->
+    {% include "myNav.html" %}
+    <div class="container flex-container">
+      <br>
+      <div class="d-flex justify-content-center">
+        <h2>Αποθηκευμένες Συσκευές</h2> 
+      </div>
+      <br>
+       <p style="padding:5px;" class="border border-secondary"><i class="fas fa-exclamation-circle"></i> &nbsp
+         Καθαρισμός Παρουσιών αδειάζει την συσκευή από όλα τα χτυπήματα καρτών και τα αποθηκεύει πριν τα σβήσει</p>
+      <br>
+       <br>
+      <div class="row">
+        <div style="margin-left:20px;" class=" form-group col-md-3">
+          <input id="device-input" class="form-control" placeholder="Αναζήτηση ονόματος συσκευής">
+        </div>
+        <div id="search-icon" class=" form-group col-md-1">
+          <i  class="fa fa-search"></i>
+        </div>
+        <form action="{% url 'CheckDevices' %}" method="post">
+          <input style="margin-left:150px;" style="float: right;" type="submit" class="btn btn-info"
+            value="ΈλεγχοςΣυσκευών" />
+          {% csrf_token %}
+        </form>
+        
+         <div style="margin-left:150px;">
+           <button type="button" class="btn btn-success" data-toggle="modal" data-target="#ModalAdd">Νέα
+             Συσκευή</button>
+         </div>
+      </div>
+
+      <div style="margin-left:20px;" id="replaceable-content">
+        {% include "searchDevicesLocation-partial.html" %}
+      </div>
+      <br>
+      <table class="table table-responsive-md table-hover table-striped">
+        <thead class="table-warning">
+          <tr class="">
+            <th>Όνομα Συσκευής</th>
+            <th>IP</th>
+            <th>Ενέργεια</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          {% for item in myDevice %}
+          <tr>
+            <td>{{item.device_location}}</td>
+            <td>{{item.device_ip}}</td>
+            <td>
+              <div class="row">
+                <form action="{% url 'deviceData' %}" method="post">
+                  <input type="hidden" name="nameDevice" value="{{item.device_location}}" />
+                  <input type="hidden" name="IP" value="{{item.device_ip}}" />
+                  <input style="float: left;" type="submit" class="btn btn-primary" value="Επεξεργασία" />
+                  {% csrf_token %}
+                </form>
+                &nbsp
+                
+                 <form action="{% url 'deviceClear' %}" method="post">
+
+                   <input type="hidden" name="idDevice" value="{{item.id}}" />
+
+                   <input style="float: right;" type="submit" class="btn btn-secondary" value="Kαθαρισμός Παρουσιών" />
+                   {% csrf_token %}
+                 </form>
+                 
+                    &nbsp
+                <form action="{% url 'deviceDelete' %}" method="post">
+
+                  <input type="hidden" name="idDevice" value="{{item.id}}" />
+
+                  <input style="float: right;" type="submit" class="btn btn-danger" value="Διαγραφή" />
+                  {% csrf_token %}
+                </form>
+                <div>
+            </td>
+
+          </tr>
+          {% endfor %}
+
+        </tbody>
+      </table>
+    </div>
+    <br>
+    {% include "messages.html" %} {% comment %} to display success or error messages {% endcomment %}
+    <br>
+    <div class="d-flex justify-content-center">
+      {% if myDevice.has_other_pages %}
+      <ul class="pagination pagination-lg ">
+        {% if myDevice.has_previous %}
+        <li class="page-item"><a class="page-link" href="?page={{ myDevice.previous_page_number }}">&laquo;</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled"><span>&laquo;</span></li>
+        {% endif %}
+        {% for i in myDevice.paginator.page_range %}
+        {% if myDevice.number == i %}
+        <li class="page-item active"><span class="page-link">{{ i }} <span class="sr-only">(current)</span></span>
+        </li>
+
+        {% elif i > myDevice.number|add:'-3' and i < myDevice.number|add:'3' %}
+        <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+
+        {% endif %}
+
+        {% if  myDevice.number|add:'3' == i %}
+        <li class="page-item"><a class="page-link">⋯</a></li>
+        <li class="page-item"><a class="page-link"
+            href="?page={{myDevice.paginator.num_pages}}">{{myDevice.paginator.num_pages }}</a></li>
+        {% endif %}
+
+        {% if  myDevice.number|add:'-3' == i %}
+        <li class="page-item"><a class="page-link" href="?page={{1}}">{{1}}</a></li>
+        <li class="page-item"><a class="page-link">⋯</a></li>
+        {% endif %}
+        {% comment %} {% else %}
+        <li class="page-item"><a class="page-link" href="?pageA={{ i }}">{{ i }}</a></li>
+        {% endif %} {% endcomment %}
+        {% endfor %}
+        {% if fullatendances.has_next %}
+        <li class="page-item"><a class="page-link" href="?page={{ myDevice.next_page_number }}">&raquo;</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled"><span>&raquo;</span></li>
+        {% endif %}
+      </ul>
+      {% endif %}
+    </div>
+    
+    <div class="modal fade" id="ModalAdd" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Προσθήκη νέας συσκευής</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="col-8">
+              <br>
+              <form action="{% url 'deviceAdd' %}" method="post">
+                {% csrf_token %}
+
+                <div class="form-outline mb-2">
+                  <label for="deviceName">Όνομα συσκευής</label>
+                  <input type="text" class="form-control" name="nameDevice" aria-describedby="emailHelp"
+                    placeholder="Enter device name" required>
+                </div>
+                <div class="form-outline mb-2">
+                  <label for="exampleInput">IP συσκευής</label>
+                  <input type="text" class="form-control" name="IP" placeholder="Enter device IP" required>
+                </div>
+                <div class="form-outline mb-2">
+                  <label for="exampleInput">Port συσκευής</label>
+                  <input type="number" class="form-control" name="port" placeholder="Enter device port" value=4370
+                    required>
+                </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Κλείσιμο</button>
+            <button type="submit" class="btn btn-primary">Αποθήκευση</button>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </body>
+
+  <script>
+    const device_input = $("#device-input")
+    const search_icon = $('#search-icon')
+    const search_div = $('#replaceable-content')
+    const endpoint = 'devicesSearch'
+    const delay_by_in_ms = 700
+    let scheduled_function = false
+
+    let ajax_call = function (endpoint, request_parameters) {
+      $.getJSON(endpoint, request_parameters)
+        .done(response => {
+          // fade out the artists_div, then:
+          search_div.fadeTo('slow', 0).promise().then(() => {
+            // replace the HTML contents
+            search_div.html(response['html_from_view'])
+            // fade-in the div with new contents
+            search_div.fadeTo('slow', 1)
+            // stop animating search icon
+            search_icon.removeClass('blink')
+          })
+        })
+    }
+
+
+    device_input.on('keyup', function () {
+
+      const request_parameters = {
+        q: $(this).val() // value of user_input: the HTML element with ID user-input
+      }
+
+      // start animating the search icon with the CSS class
+      search_icon.addClass('blink')
+
+      // if scheduled_function is NOT false, cancel the execution of the function
+      if (scheduled_function) {
+        clearTimeout(scheduled_function)
+      }
+
+      // setTimeout returns the ID of the function to be executed
+      scheduled_function = setTimeout(ajax_call, delay_by_in_ms, endpoint, request_parameters)
+    })
+
+  </script>
+  
+
+</html>

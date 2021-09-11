@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8" />
+    <!-- κληρονομεί οτι υπαρχει μεσα στο basic.html -->
+    {% include "basic.html" %} {% load static %}
+    <link rel="stylesheet" type="text/css"  href="{% static 'jquery.simple-dtpicker.css' %}"/>
+    <script src="{% static 'jquery.simple-dtpicker.js' %}"></script>
+
+    <title>Staff holidays</title>
+    <style>
+      @keyframes blinker {
+        from {
+          opacity: 1.0;
+        }
+
+        to {
+          opacity: 0.0;
+        }
+      }
+
+      .blink{
+        text-decoration: blink;
+        animation-name: blinker;
+        animation-duration: 0.6s;
+        animation-iteration-count: infinite;
+        animation-timing-function: ease-in-out;
+        animation-direction: alternate;
+      }
+
+    </style>
+    
+  </head>
+
+  <body>
+  <script>
+  $(document).ready(function() {
+    
+  $('*[name=startHoliday]').appendDtpicker({//tag name=kati gia selector
+    "locale":"gr",
+      });
+  $('*[name=startHoliday]').handleDtpicker('setDate',new Date(Date.now()));
+    
+     
+     $('*[name=endHoliday]').appendDtpicker({//tag name=kati gia selector
+    "locale":"gr",
+      });
+     var now = new Date();
+  $('*[name=endHoliday]').handleDtpicker('setDate',new Date().setDate(now.getDate()+1));
+  
+  $('#userForHoliday').select2({
+      theme: "classic",
+      placeholder: 'Select an option'
+      });
+    
+  });
+</script>
+
+ 
+    <!-- ενσωματωση του navbar -->
+    {% include "myNav.html" %}
+     <br>
+     <center>
+     <h2>Άδειες Προσωπικού</h2>
+     </center>
+     <br>
+     <div class="container">
+      <p style="padding:5px;" class="border border-secondary"><i class="fas fa-exclamation-circle"></i> &nbsp Η ημέρα άδειας πρέπει να ξεκινάει στις 00:00:00 αρχικής ημέρας και λήγει στις 00:00:00 της επόμενης ημέρας, σε περίπτωση ολόκληρης ή περισσότερων ολόκληρων ημερών.</p>
+      </div>
+      <br>
+    <div style="padding:10px;width:60%;" class="container border border-secondary">
+     <center>
+     <h5>Προσθήκη άδειας</h5>
+     </center>
+      <form action="{% url 'staffHolidays' %}" method="post">
+        {% csrf_token %}
+            <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="inputState">Επιλογή προσωπικού</label>
+            <select id="userForHoliday" name="userForHoliday" class="form-control">
+              {% for item in Users %}
+              <option value={{item.device_card_number}}>{{item.first_name}} {{item.last_name}} {{item.email}}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group col-md-6">
+            <label for="inputState">Λόγος Άδειας</label>
+            <input class="form-control"  type="text"  name="desc_holi_staff" required>
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="inputState">Έναρξη Αδειας</label>
+            <input class="form-control"  type="text" name="startHoliday" value="" required>
+          </div>
+          <div class="form-group col-md-6">
+            <label for="inputState">Λήξη Αδειας</label>
+            <input class="form-control"  type="text"  name="endHoliday" value="" required>
+          </div>
+        </div>
+  <center>
+  <button type="submit" class="btn btn-primary">Προσθήκη</button>
+  </center>
+</form>
+
+    </div>
+
+   {% include "messages.html" %}
+   
+    <br>
+      <div class="row d-flex justify-content-center">
+        <div style="margin-left:20px;" class=" form-group col-md-4">
+          <input id="staffHoliday-input" class="form-control" placeholder="Αναζήτηση άδειας προσωπικού με Όνομα/Επώνυμο">
+        </div>
+        <div id="search-icon" class=" form-group col-md-1">
+          <i  class="fas fa-search"></i>
+        </div>
+      </div>
+
+      <div style="margin-left:20px;" id="replaceable-content">
+        {% include "searchStaffHolidays-partial.html" %}
+      </div>
+      <br> 
+   
+   <div style="margin-left:30px;padding:10px;width:95%;" class="container-xxl border border-secondary">
+     <center>
+     <h5>Αποθηκευμένες άδειες προσωπικού</h5>
+     </center>
+   <table class="table table-responsive-xl table-hover table-striped">
+        <thead class="table-warning">
+          <tr>
+            <th>A/A</th>
+            <th>Προσωπικό</th>
+            <th>Από</th>
+            <th>Εώς</th>
+            <th>Λόγος Άδειας</th>
+            <th>Ενέργειες</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          {% for item in StaffHolidays %}
+          <tr>
+            <td>{{item.id}}</td>
+            <td>(card_number):{{item.staff_card}} {{item.last_name}} {{item.first_name}}</td>
+            <td>{{item.date_from|date:"d/m/Y--H:i:s"}}</td>
+            <td>{{item.date_to|date:"d/m/Y--H:i:s"}}</td>
+            <td>{{item.description}}</td>
+            <td>
+              <div class="row">
+               <button type="button" onclick="myFunction(id={{item.id}})" class="btn btn-primary" data-toggle="modal"
+                 data-target="#ModalEdit">
+                 Επεξεργασία
+               </button>
+               &nbsp; &nbsp;
+                <form action="{% url 'staffHolidaysDelete' %}" method="post">
+                  <input type="hidden" name="id_staffHolidays" value="{{item.id}}" />
+                  <input style="margin-left:20px;" type="submit" class="btn btn-danger" value="Διαγραφή" />
+                  {% csrf_token %}
+                </form>
+                <div>
+            </td>
+
+          </tr>
+          {% endfor %}
+
+        </tbody>
+      </table>
+      
+      <br>
+      <div class="d-flex justify-content-center">
+      {% if StaffHolidays.has_other_pages %}
+      <ul class="pagination pagination-lg ">
+        {% if StaffHolidays.has_previous %}
+        <li class="page-item"><a class="page-link" href="?page={{ StaffHolidays.previous_page_number }}">&laquo;</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled"><span>&laquo;</span></li>
+        {% endif %}
+        {% for i in StaffHolidays.paginator.page_range %}
+        {% if StaffHolidays.number == i %}
+        <li class="page-item active"><span class="page-link">{{ i }} <span class="sr-only">(current)</span></span>
+        </li>
+
+        {% elif i > StaffHolidays.number|add:'-3' and i < StaffHolidays.number|add:'3' %}
+        <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+
+        {% endif %}
+
+        {% if  StaffHolidays.number|add:'3' == i %}
+        <li class="page-item"><a class="page-link">⋯</a></li>
+        <li class="page-item"><a class="page-link"
+            href="?page={{StaffHolidays.paginator.num_pages}}">{{StaffHolidays.paginator.num_pages }}</a></li>
+        {% endif %}
+
+        {% if  StaffHolidays.number|add:'-3' == i %}
+        <li class="page-item"><a class="page-link" href="?page={{1}}">{{1}}</a></li>
+        <li class="page-item"><a class="page-link">⋯</a></li>
+        {% endif %}
+        {% comment %} {% else %}
+        <li class="page-item"><a class="page-link" href="?pageA={{ i }}">{{ i }}</a></li>
+        {% endif %} {% endcomment %}
+        {% endfor %}
+        {% if StaffHolidays.has_next %}
+        <li class="page-item"><a class="page-link" href="?page={{ StaffHolidays.next_page_number }}">&raquo;</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled"><span>&raquo;</span></li>
+        {% endif %}
+      </ul>
+      {% endif %}
+    </div>
+
+    </div>
+    
+    
+    <!-- Modal for edit-->
+    <div class="modal fade" id="ModalEdit" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog  modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Επεξεργασία Αργίας Προσωπικού</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div id="edit">
+              <form class="form-horizontal" action="{% url 'staffHolidayEdit'%}" method="post">
+                {% csrf_token %}
+                <div class="form-group" id="editForFind">
+                  <div class="form-row">
+                    <div class="form-group col-md-6">
+                      <label for="inputState">Λόγος Άδειας</label>
+                      <input class="form-control" id="descEdit" type="text" name="desc" required>
+                    </div>
+                    </div>
+                    <div class="form-row">
+                      <div class="form-group col-md-6">
+                        <label for="inputState">Έναρξη Αδειας</label>
+                        <input class="form-control" type="text" name="startHolidayEdit" value="" required>
+                      </div>
+                      <div class="form-group col-md-6">
+                        <label for="inputState">Λήξη Αδειας</label>
+                        <input class="form-control" type="text" name="endHolidayEdit" value="" required>
+                      </div>
+                  </div>
+                </div>
+                <input type="hidden" name="userForHoliday" id="staffCardEdit">
+                <input type="hidden" name="id" id="passEditId">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <div style="margin-right:30%;">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Κλείσιμο</button>
+              <button type="submit" class="btn btn-primary">Αποθήκευση</button>
+            </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+  
+  <script>
+  function myFunction(
+  id
+  ) { // ajax to perform get request to get the string object based on id, which is printed inside the function of
+  
+  console.log(id)
+  ajaxObject = $.ajax({
+  method: 'GET',
+  url: "staffHolidayGet/" + id,
+  contentType: 'application/json',
+  success: function (response) {
+  console.log(response);
+  var mySplit = response.split(
+  ',');
+  console.log(mySplit);
+  $("#passEditId").val(id); // we pass it to hidden field of edit form
+
+  var desc = $("#descEdit").val(mySplit[2]);
+  var staff_card = $("#staffCardEdit").val(mySplit[3]);
+  $('*[name=startHolidayEdit]').appendDtpicker({//tag name=kati gia selector
+  "locale":"gr",
+  });
+  $('*[name=startHolidayEdit]').handleDtpicker('setDate',new Date(mySplit[0]));
+
+
+  $('*[name=endHolidayEdit]').appendDtpicker({//tag name=kati gia selector
+  "locale":"gr",
+  });
+  $('*[name=endHolidayEdit]').handleDtpicker('setDate',new Date(mySplit[1]));
+  
+  //console.log($('*[name=endHolidayEdit]').val())
+
+  },
+  // Check for existence of file
+  error: function (err) {
+  console.log(err);
+  }
+  });
+  }
+  
+  
+  
+  
+    const staffHoliday_input = $("#staffHoliday-input")
+    const search_icon = $('#search-icon')
+    const search_div = $('#replaceable-content')
+    const endpoint = 'staffHolidaysSearch'
+    const delay_by_in_ms = 700
+    let scheduled_function = false
+
+    let ajax_call = function (endpoint, request_parameters) {
+      $.getJSON(endpoint, request_parameters)
+        .done(response => {
+          // fade out the artists_div, then:
+          search_div.fadeTo('slow', 0).promise().then(() => {
+            // replace the HTML contents
+            search_div.html(response['html_from_view'])
+            // fade-in the div with new contents
+            search_div.fadeTo('slow', 1)
+            // stop animating search icon
+            search_icon.removeClass('blink')
+          })
+        })
+    }
+
+
+    staffHoliday_input.on('keyup', function () {
+      const request_parameters = {
+        q: $(this).val()// value of user_input: the HTML element with ID user-input
+      }
+      // start animating the search icon with the CSS class
+      search_icon.addClass('blink')
+      
+      // if scheduled_function is NOT false, cancel the execution of the function
+      if (scheduled_function) {
+        clearTimeout(scheduled_function)
+      }
+      // setTimeout returns the ID of the function to be executed
+      scheduled_function = setTimeout(ajax_call, delay_by_in_ms, endpoint, request_parameters)
+    })
+
+  </script>
+</body>
+</html>

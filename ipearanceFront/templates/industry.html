@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8" />
+    <!-- κληρονομεί οτι υπαρχει μεσα στο basic.html -->
+    {% include "basic.html" %}
+    
+    <title>Industry</title>
+  </head>
+
+  <body>
+  <script>
+  $(document).ready(function () {
+        $('#timepicker1').timepicker({
+          timeFormat: 'HH:mm',
+          interval: 30,
+          defaultTime: '{{industry.general_work_range_from|date:"H:i"}}',
+          dynamic: true,
+          dropdown: true,
+          scrollbar: true,
+          use24hours: true
+        });
+        $('#timepicker2').timepicker({
+          timeFormat: 'HH:mm',
+          interval: 30,
+          defaultTime: '{{industry.general_work_range_to|date:"H:i"}}',
+          dynamic: true,
+          dropdown: true,
+          scrollbar: true,
+          use24hours: true
+        });  
+      });
+    </script>
+    <!-- ενσωματωση του navbar -->
+    {% include "myNav.html" %}
+     <br>
+     <center>
+     <h1>Στοιχεία Φορέα</h1>
+     </center>
+     <br>
+    <div style="padding:10px;width:60%;" class="container border border-secondary">
+     <center>
+     <h5>Επεξεργασία Φορέα</h5>
+     </center>
+      <form action="{% url 'industry' %}" method="post">
+        {% csrf_token %}
+            <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="inputState">Όνομα Φορέα</label>
+            <input class="form-control"  type="text"  name="nameI" value='{{industry.name}}' required>
+          </div>
+
+          <div class="form-group col-md-6">
+            <label for="inputState">Διεύθυνση Φορέα</label>
+            <input class="form-control" type="text" name="addressI" value='{{industry.address}}' required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="inputState">ΑΦΜ</label>
+            <input class="form-control" type="number" name="afmI" value='{{industry.afm}}' required>
+          </div>      
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="inputState">Έναρξη γενικού ωραρίου</label>
+            <input class="form-control"  type="text" id="timepicker1"  name="general_work_r_f"  required>
+          </div>
+
+          <div class="form-group col-md-6">
+            <label for="inputState">Λήξη γενικού ωραρίου</label>
+            <input class="form-control" type="text" id="timepicker2" name="general_work_r_t"  required>
+          </div>
+        </div>
+  <center>
+  <button type="submit" class="btn btn-primary">Αποθήκευση</button>
+  </center>
+</form>
+
+    </div>
+
+   {% include "messages.html" %} 
+   
+   <div style="padding:10px;width:60%;" class="container border border-secondary">
+     <center>
+     <h5>Λογότυπο Φορέα</h5>
+     </center>
+    <form action="{% url 'industryLogo' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+            <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="inputState">Επιλέξτε λογότυπο</label>
+            <input class="form-control-file" type="file"  name="theLogo" required>
+          </div>
+    
+            <div class="form-group col-md-6">
+            <img style="margin-left:30%;" src="{{industry.logo}}" alt="Smiley face" width="100" height="100">
+          </div>
+
+        </div>
+  <center>
+  <button type="submit" class="btn btn-primary">Αποθήκευση</button>
+  </center>
+</form>
+
+    </div>
+    
+  </body>
+
+</html>

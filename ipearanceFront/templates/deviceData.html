@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8" />
+    {% include "basic.html" %}{% load static %}
+    <link rel="stylesheet" href="{% static 'allCss/deviceData.css' %}" />
+    <title>Device Data</title>
+  </head>
+  <style>
+  @keyframes blinker {
+  from {
+  opacity: 1.0;
+  }
+
+  to {
+  opacity: 0.0;
+  }
+  }
+
+  .blink {
+  text-decoration: blink;
+  animation-name: blinker;
+  animation-duration: 0.6s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+  animation-direction: alternate;
+  }
+
+  </style>
+
+  <body>
+
+    <!-- εισαγωγή navbar -->
+    {% include "myNav.html" %}
+
+    <!-- Πληροφορίες Συσκευής -->
+    <div class="mt-4 mr-4 ml-4">
+      <div class="d-flex justify-content-center">
+        <h3> Πληροφορίες Συσκευής: {{nameDevice}} </h3>
+      </div>
+      <table class="table">
+        <tbody>
+          <tr>
+            <td>
+              <b>Status</b>
+            </td>
+            <td>Connected</td>
+            <td>
+              <b>Version</b>
+            </td>
+            <td>{{version}}</td>
+            <td>
+              <b>OS Version</b>
+            </td>
+            <td>{{os_version}}</td>
+            <td>
+              <b>Platform</b>
+            </td>
+            <td>{{platform}}</td>
+          </tr>
+          <tr>
+            <td>
+              <b>Firmware Version </b>
+            </td>
+            <td>{{firm_version}}</td>
+            <td>
+              <b> WorkCode </b>
+            </td>
+            <td></td>
+            <td>
+              <b>SSR</b>
+            </td>
+            <td></td>
+            <td>
+              <b>Pin Width</b>
+            </td>
+            <td>{{pin_width}}</td>
+          </tr>
+          <tr>
+            <td>
+              <b>Face Function On</b>
+            </td>
+            <td>{{face_function}}</td>
+            <td>
+              <b> Serial Number </b>
+            </td>
+            <td>{{serial_num}}</td>
+            <td>
+              <b> Device Name </b>
+            </td>
+            <td>{{dev_name}}</td>
+            <td>
+              <b> Get Time </b>
+            </td>
+            <td>{{get_time}}</td>
+          </tr>
+        </tbody>
+      </table>
+      <hr>
+    </div>
+    {% include "messages.html" %}
+
+    <br>
+    <div style="margin-left:100px;" class="form-row d-flex justify-content-center">
+      <div class=" form-group col-md-3">
+        <input id="devU-input" class="form-control" placeholder="Αναζήτιση χρήστη συσκευής με username ή card id">
+      </div>
+      <div id="search-iconDU" style="margin-left:10px;" class=" form-group col-md-1">
+        <i class="fa fa-search"></i>
+      </div>
+
+      <div style="margin-left:50px;" class=" form-group col-md-4">
+        <input id="devAtt-input" class="form-control"
+          placeholder="Αναζήτιση παρουσία συσκευής με card id, card number ή username">
+      </div>
+      <div id="search-iconDA" style="margin-left:10px;" class=" form-group col-md-1">
+        <i class="fa fa-search"></i>
+      </div>
+    </div>
+    <br>
+    {% include "messages.html" %}
+    <div class="d-flex justify-content-between">
+      <div style="margin-left:100px;" id="replaceable-content1">
+        {% include "searchDeviceDUsers-partial.html" %}
+      </div>
+      <div style="margin-left:100px;" id="replaceable-content2">
+        {% include "searchDeviceDAtt-partial.html" %}
+      </div>
+
+
+    </div>
+    <br>
+    <!-- Πρωτος πίνακας παρουσιασης στοιχειων/ονομα/user_id/καρτα -->
+    <div class="container-xxl container-fluid">
+      <div class="row">
+        <div class="col-5">
+          <table class="table table-striped table-bordered table-hover">
+            <thead>
+              <tr>
+                <th class="table-warning">(UID) Α/Α</th>
+                <th class="table-warning">(ID Κάρτας) Επώνυμο/Όνομα</th>
+                <th class="table-warning"> Αριθμός Κάρτας</th>
+              </tr>
+            </thead>
+
+
+            {% for row in myUsers %}
+            <tr>
+              <td>{{ row.uid }}</td>
+              <td>({{ row.user_id}}),{{ row.name}}</td>
+              <td>{{ row.card}}</td>
+            </tr>
+            {% endfor %}
+          </table>
+          {% if myUsers.has_other_pages %}
+          <ul class="pagination pagination-lg">
+            {% if myUsers.has_previous %}
+            <li class="page-item"><a class="page-link" href="?pageU={{ myUsers.previous_page_number }}">&laquo;</a></li>
+            {% else %}
+            <li class="page-item disabled"><span>&laquo;</span></li>
+            {% endif %}
+            {% for i in myUsers.paginator.page_range %}
+            {% if myUsers.number == i %}
+            <li class="page-item active"><span class="page-link">{{ i }} <span class="sr-only">(current)</span></span>
+            </li>
+            {% comment %} {% else %} {% endcomment %}
+
+
+            {% elif i > myUsers.number|add:'-3' and i < myUsers.number|add:'3' %}
+            <li class="page-item"><a class="page-link" href="?pageU={{ i }}">{{ i }}</a></li>
+
+            {% endif %}
+
+            {% if  myUsers.number|add:'3' == i %}
+            <li class="page-item"><a class="page-link">⋯</a></li>
+            <li class="page-item"><a class="page-link"
+                href="?pageU={{myUsers.paginator.num_pages}}">{{myUsers.paginator.num_pages }}</a></li>
+            {% endif %}
+
+            {% if  myUsers.number|add:'-3' == i %}
+            <li class="page-item"><a class="page-link" href="?pageU={{1}}">{{1}}</a></li>
+            <li class="page-item"><a class="page-link">⋯</a></li>
+            {% endif %}
+
+            {% comment %} <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}</a></li>
+            {% endif %} {% endcomment %}
+            {% endfor %}
+
+
+            {% if myUsers.has_next %}
+            <li class="page-item"><a class="page-link" href="?pageU={{ myUsers.next_page_number }}">&raquo;</a></li>
+            {% else %}
+            <li class="page-item disabled"><span>&raquo;</span></li>
+            {% endif %}
+          </ul>
+          {% endif %}
+
+        </div>
+        <!-- Δευτερος πίνακας live παρουσιών -->
+        <div class="col-7">
+          <table class="table table-striped table-bordered table-hover">
+            <thead>
+              <tr>
+                <th class="table-warning">Παρουσίες Χρηστών</th>
+              </tr>
+            </thead>
+
+
+
+            {% for item in fullatendances %}
+            <tr>
+              <!-- στοιχεια που ερχονται απο python -->
+              {% comment %} <td>({{ item.user_id }})
+                {{ item.username }},{{ item.attendance_dateTime|date:'l d F Y,H:i:s' }} </td> {% endcomment %}
+              <td>{{ item }} </td>
+            </tr>
+            {% endfor %}
+          </table>
+
+          {% if fullatendances.has_other_pages %}
+          <ul class="pagination pagination-lg ">
+            {% if fullatendances.has_previous %}
+            <li class="page-item"><a class="page-link"
+                href="?pageA={{ fullatendances.previous_page_number }}">&laquo;</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled"><span>&laquo;</span></li>
+            {% endif %}
+            {% for i in fullatendances.paginator.page_range %}
+            {% if fullatendances.number == i %}
+            <li class="page-item active"><span class="page-link">{{ i }} <span class="sr-only">(current)</span></span>
+            </li>
+
+            {% elif i > fullatendances.number|add:'-3' and i < fullatendances.number|add:'3' %}
+            <li class="page-item"><a class="page-link" href="?pageA={{ i }}">{{ i }}</a></li>
+
+            {% endif %}
+
+            {% if  fullatendances.number|add:'3' == i %}
+            <li class="page-item"><a class="page-link">⋯</a></li>
+            <li class="page-item"><a class="page-link"
+                href="?pageA={{fullatendances.paginator.num_pages}}">{{fullatendances.paginator.num_pages }}</a></li>
+            {% endif %}
+
+            {% if  fullatendances.number|add:'-3' == i %}
+            <li class="page-item"><a class="page-link" href="?pageA={{1}}">{{1}}</a></li>
+            <li class="page-item"><a class="page-link">⋯</a></li>
+            {% endif %}
+            {% comment %} {% else %}
+            <li class="page-item"><a class="page-link" href="?pageA={{ i }}">{{ i }}</a></li>
+            {% endif %} {% endcomment %}
+            {% endfor %}
+            {% if fullatendances.has_next %}
+            <li class="page-item"><a class="page-link" href="?pageA={{ fullatendances.next_page_number }}">&raquo;</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled"><span>&raquo;</span></li>
+            {% endif %}
+          </ul>
+          {% endif %}
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </body>
+  <script>
+    const devU_input = $("#devU-input")
+    const search_iconDU = $('#search-iconDU')
+    const search_div = $('#replaceable-content1')
+    const endpoint = 'searchDevU'
+    const delay_by_in_ms = 700
+    let scheduled_function = false
+
+    let ajax_call = function (endpoint, request_parameters) {
+      $.getJSON(endpoint, request_parameters)
+        .done(response => {
+          // fade out the artists_div, then:
+          search_div.fadeTo('slow', 0).promise().then(() => {
+            // replace the HTML contents
+            search_div.html(response['html_from_view'])
+            // fade-in the div with new contents
+            search_div.fadeTo('slow', 1)
+            // stop animating search icon
+            search_iconDU.removeClass('blink')
+          })
+        })
+    }
+
+
+    devU_input.on('keyup', function () {
+
+      const request_parameters = {
+        q: $(this).val() // value of user_input: the HTML element with ID user-input
+      }
+
+      // start animating the search icon with the CSS class
+      search_iconDU.addClass('blink')
+
+      // if scheduled_function is NOT false, cancel the execution of the function
+      if (scheduled_function) {
+        clearTimeout(scheduled_function)
+      }
+
+      // setTimeout returns the ID of the function to be executed
+      scheduled_function = setTimeout(ajax_call, delay_by_in_ms, endpoint, request_parameters)
+    })
+
+  </script>
+
+  <script>
+    const devAtt_input = $("#devAtt-input")
+    const search_iconDA = $('#search-iconDA')
+    const search_div2 = $('#replaceable-content2')
+    const endpoint2 = 'searchDevAtt'
+    const delay_by_in_ms2 = 700
+    let scheduled_function2 = false
+
+    let ajax_call2 = function (endpoint2, request_parameters2) {
+      $.getJSON(endpoint2, request_parameters2)
+        .done(response => {
+          // fade out the artists_div, then:
+          search_div2.fadeTo('slow', 0).promise().then(() => {
+            // replace the HTML contents
+            search_div2.html(response['html_from_view'])
+            // fade-in the div with new contents
+            search_div2.fadeTo('slow', 1)
+            // stop animating search icon
+            search_iconDA.removeClass('blink')
+          })
+        })
+    }
+
+
+    devAtt_input.on('keyup', function () {
+
+      const request_parameters2 = {
+        q: $(this).val() // value of user_input: the HTML element with ID user-input
+      }
+
+      // start animating the search icon with the CSS class
+      search_iconDA.addClass('blink')
+
+      // if scheduled_function is NOT false, cancel the execution of the function
+      if (scheduled_function2) {
+        clearTimeout(scheduled_function2)
+      }
+
+      // setTimeout returns the ID of the function to be executed
+      scheduled_function2 = setTimeout(ajax_call2, delay_by_in_ms2, endpoint2, request_parameters2)
+    })
+
+  </script>
+
+</html>

@@ -1,0 +1,33 @@
+
+          <div id="table" class="row">
+            <div class="col-10">
+              <table class="table table-responsive-md table-hover table-striped">
+                <tbody>
+                {% if mySearch %}
+                  {% for item in mySearch %}
+                  <tr>
+            <td>{{item.id}}</td>
+            <td>(card_id){{item.staff_id}} {{item.last_name}} {{item.first_name}}</td>
+            <td>{{item.date_from|date:"D d M Y H:i:s"}}</td>
+            <td>{{item.date_to|date:"D d M Y H:i:s"}}</td>
+            <td>{{item.decription}}</td>
+            <td>
+              <div class="row">
+                <form action="{% url 'staffHolidaysDelete' %}" method="post">
+                  <input type="hidden" name="id_staffHolidays" value="{{item.id}}" />
+                  <input style="float: right;" type="submit" class="btn btn-danger" value="Διαγραφή" />
+                  {% csrf_token %}
+                </form>
+                <div>
+            </td>
+          </tr>
+                  {% endfor %}
+                  {% endif %}
+                  {% if noResults %}
+            <p style="margin:20px;" >Δεν βρέθηκαν άδειες.</p>
+                    {% endif %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        
