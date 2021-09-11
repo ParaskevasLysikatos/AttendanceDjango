@@ -1,1 +1,1 @@
-web: gunicorn ipearanceMain.wsgi:applicationn --log-file -
+web: gunicorn ipearanceMain.wsgi:application --log-file -
