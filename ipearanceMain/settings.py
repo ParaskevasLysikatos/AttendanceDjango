@@ -195,7 +195,7 @@ STATIC_ROOT = os.path.join(BASE_DIR,  'ipearanceFront/static')
 # where all excel  files are located--> /media on application folder
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'ipearanceFront/media')
-django_heroku.settings(locals())
+
 
 AUTH_USER_MODEL = 'ipearanceBackend.Users'   #our custom auth model, very important
 LOGIN_REDIRECT_URL = 'welcome'# after login redirect,very important
