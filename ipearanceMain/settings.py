@@ -13,7 +13,8 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 from pathlib import Path
 import os
 
-
+import django_heroku
+import dj_database_url
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -116,15 +117,20 @@ WSGI_APPLICATION = 'ipearanceMain.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': { 
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'dbIP4', 
+#         'USER': 'postgres', 
+#         'PASSWORD': '1',
+#         'HOST': '127.0.0.1', 
+#         'PORT': '5432',
+#     }
+# }
+
+
 DATABASES = {
-    'default': { 
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'dbIP4', 
-        'USER': 'postgres', 
-        'PASSWORD': '1',
-        'HOST': '127.0.0.1', 
-        'PORT': '5432',
-    }
+default: dj_database_url.config()
 }
 
 
@@ -182,6 +188,7 @@ STATIC_ROOT = os.path.join(BASE_DIR,  'ipearanceFront/static')
 # where all excel  files are located--> /media on application folder
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'ipearanceFront/media')
+django_heroku.settings(locals())
 
 AUTH_USER_MODEL = 'ipearanceBackend.Users'   #our custom auth model, very important
 LOGIN_REDIRECT_URL = 'welcome'# after login redirect,very important
