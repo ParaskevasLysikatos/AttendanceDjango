@@ -10,9 +10,9 @@
 
   <body>
 
-    <h1>Καλώς ήρθατε, Login</h1>
+    <h1 style="display:flex;justify-content:center;margin:2%;">Καλώς ήρθατε, Login</h1>
     <h4 style="display:flex;justify-content:center;margin:2%;">Παρουσιολόγιο (Attendance-Django)</h4>
-    <div class="d-flex justify-content-center">
+    <div class="d-flex justify-content-center max-width:50%;">
       <form action="{% url 'pagelogin' %}" method="post">
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ request.GET.next }}" />
