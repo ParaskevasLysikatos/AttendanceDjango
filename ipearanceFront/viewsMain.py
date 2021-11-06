@@ -3757,16 +3757,44 @@ def printWrariaProsopikouExcel(request):
     ws = wb.add_sheet('Ωράρια')
     # Sheet header, first row
     row_num = 0
+    #font_style = xlwt.XFStyle()
+    #font_style.font.bold = True
     font_style = xlwt.XFStyle()
-    font_style.font.bold = True
+    font_styleCap = xlwt.XFStyle()
+    font_style.alignment.wrap = 1 # Set wrap
+    font_styleCap.alignment.wrap = 1 # Set wrap
+    font_style.font.bold = False
+    font_styleCap.font.bold = True
+    
+    pattern = xlwt.Pattern()
+    pattern.pattern = xlwt.Pattern.SOLID_PATTERN
+    pattern.pattern_fore_colour = xlwt.Style.colour_map['light_green']
+    #font_style.pattern = pattern
+    font_styleCap.pattern = pattern
+    
+    first = ws.col(0)
+    second = ws.col(1)
+    third = ws.col(2)
+    fourth = ws.col(3)
+    fifth = ws.col(4)
+    sixth = ws.col(5)
+    seventh = ws.col(6)
+    
+    first.width =  220*20
+    second.width =  220*20
+    third.width =  320*20
+    fourth.width = 220*20
+    fifth.width =420*20
+    sixth.width = 920*20
+    seventh.width =220*20
     columns=['Αριθμός Κάρτας', 'Ημερομηνία', 'Επώνυμο', 'Όνομα','Ωράριο','Τμήμα','Ειδικότητα']
     for col_num in range(len(columns)):
-        ws.write(row_num, col_num, columns[col_num], font_style)
+        ws.write(row_num, col_num, columns[col_num], font_styleCap)
     font_style = xlwt.XFStyle()
     rows =saveSearch
     for row in rows:
         row_num += 1
-        for col_num in range(len(row)):
+        for col_num in range(0,len(row)):
             ws.write(row_num, col_num, row.get('user_card'), font_style)
             break
         for col_num in range(1,len(row)):
@@ -3781,10 +3809,10 @@ def printWrariaProsopikouExcel(request):
         for col_num in range(4,len(row)):
             ws.write(row_num, col_num, row.get('wrario'), font_style)
             break
-        for col_num in range(6,len(row)):
+        for col_num in range(5,len(row)):
             ws.write(row_num, col_num, row.get('department'), font_style)
             break
-        for col_num in range(7,len(row)):
+        for col_num in range(6,len(row)):
             ws.write(row_num, col_num, row.get('relationType'), font_style)
             break
        # writer.writerow({'A/A': item.get('IDuser'), 'Ημερομηνία': item.get('date'), 'Επώνυμο': item.get('last_name'),'Όνομα': item.get('first_name'), 'Ωράριο': item.get('wrario'), 'Τμήμα': item.get('department'),'Ειδικότητα': item.get('relationType')})
