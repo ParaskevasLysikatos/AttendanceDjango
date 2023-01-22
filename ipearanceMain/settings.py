@@ -10,13 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
-from environs import Env
-import dj_database_url
 
-env = Env()
-env.read_env()
-
-db_config = dj_database_url.config(conn_max_age=600, ssl_require=True)
 
 from pathlib import Path
 import os
@@ -28,6 +22,13 @@ sys.modules['fontawesome_free'] = __import__('fontawesome-free')
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+from environs import Env
+import dj_database_url
+
+env = Env()
+env.read_env()
+
+db_config = dj_database_url.config(conn_max_age=600, ssl_require=True)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
