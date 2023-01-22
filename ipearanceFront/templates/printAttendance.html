@@ -74,30 +74,30 @@
         </form>
         <div class="col-md-2">
           {% if date1  %}
-          {% ifequal ChoicePrint "analytic" %}
+          {% if ChoicePrint == "analytic" %}
           <form action="{% url 'printAttendancePDF' %}" method="post">
             {% csrf_token %}
             <button style="margin-top:32px;" type="submit" class="btn btn-secondary">Εκτύπωση Αναλυτική</button>
             </form>
-            {% endifequal %}
-            {% ifequal ChoicePrint "periodic" %}
+            {% endif %}
+            {% if ChoicePrint == "periodic" %}
             <form action="{% url 'printPeriodicAttPDF' %}" method="post">
               {% csrf_token %}
               <button style="margin-top:32px;" type="submit" class="btn btn-secondary">Εκτύπωση Περιοδική</button>
             </form>
-            {% endifequal %}
-            {% ifequal ChoicePrint "e-p-day" %}
+            {% endif %}
+            {% if ChoicePrint == "e-p-day" %}
             <form action="{% url 'printElPlDayPDF' %}" method="post">
               {% csrf_token %}
               <button style="margin-top:32px;" type="submit" class="btn btn-secondary">Εκτύπωση Ελ/Πλ Ημέρα</button>
             </form>
-            {% endifequal %}
-            {% ifequal ChoicePrint "e-p-periodic" %}
+            {% endif %}
+            {% if ChoicePrint == "e-p-periodic" %}
             <form action="{% url 'printElPlPeriodicPDF' %}" method="post">
               {% csrf_token %}
               <button style="margin-top:32px;" type="submit" class="btn btn-secondary">Εκτύπωση Ελ/Πλ Περίοδο</button>
             </form>
-            {% endifequal %}
+            {% endif %}
             {% endif %}
         </div>
       </div>
@@ -146,8 +146,8 @@
 
 
         {% for row in fullattendaces %}
-        {% ifequal d.day row.day %}
-        {% ifequal dep.DepName row.department %}
+        {% if d.day == row.day %}
+        {% if dep.DepName == row.department %}
         <tr>
           <td><i>{{row.Role}}</i>:({{row.user_card}}) {{row.first_name}} {{row.last_name}} του {{row.fathers_name}}</td>
           <td>{{row.Fattendance_time}}</td>
@@ -160,8 +160,8 @@
           <td>{{row.worked_hours_in_range}}</td>
           <td>{{row.Hrms}}</td>
         </tr>
-        {% endifequal %}
-        {% endifequal %}
+        {% endif %}
+        {% endif %}
         {% endfor %}
         {% endfor %}
         {% endfor %}

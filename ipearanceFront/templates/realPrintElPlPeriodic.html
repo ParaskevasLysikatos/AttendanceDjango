@@ -120,7 +120,7 @@
 
                     {% for row in summaryPeriodic %}
 
-                    {% ifequal dep.DepName row.department %}
+                    {% if dep.DepName == row.department %}
 
 
                     <tr style="border-color:black;border-style: solid;padding:2px;margin:2%;">
@@ -131,7 +131,7 @@
                         <td style="width:14%;">{{row.sumElleimma}}</td>
                         <td style="width:14%;">{{row.sumPleonasma}}</td>
                     </tr>
-                    {% endifequal %}
+                    {% endif %}
                     {% endfor %}
                     {% endfor %}
 

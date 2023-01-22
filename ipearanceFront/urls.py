@@ -91,15 +91,15 @@ urlpatterns = [
     path('depInfoSearch', viewsMain.depInfoSearch,name='depInfoSearch'),
     
     
-    #path('seed1', viewsSeeders.seedUsers,name='seed1'),# test seed users from excel  
-    #path('seed2', viewsSeeders.seedDevices,name='seed2'),# test seed devices from excel
-    #path('seed3', viewsSeeders.seedDepartments,name='seed3'),# test seed departments from excel
-    #path('seed4', viewsSeeders.seedStaffDepartments,name='seed4'),# test seed staff departments info from excel
-    #path('seed5', viewsSeeders.seedRoles,name='seed5'),# test seed roles from excel
-    #path('seed6', viewsSeeders.seedIndustry,name='seed6'),# test seed industry from excel
-    #path('seed7', viewsSeeders.seedSignatures,name='seed7'),# test seed signatures from excel, same as roles
-    #path('seed8', viewsSeeders.seedMembers,name='seed8'),# test seed members from excel
-    #path('seed9', viewsSeeders.seedRelationTypes,name='seed9')# test seed members from excel
+    path('seed1', viewsSeeders.seedUsers,name='seed1'),# test seed users from excel  
+    path('seed2', viewsSeeders.seedDevices,name='seed2'),# test seed devices from excel
+    path('seed3', viewsSeeders.seedDepartments,name='seed3'),# test seed departments from excel
+    path('seed4', viewsSeeders.seedStaffDepartments,name='seed4'),# test seed staff departments info from excel
+    path('seed5', viewsSeeders.seedRoles,name='seed5'),# test seed roles from excel
+    path('seed6', viewsSeeders.seedIndustry,name='seed6'),# test seed industry from excel
+    path('seed7', viewsSeeders.seedSignatures,name='seed7'),# test seed signatures from excel, same as roles
+    path('seed8', viewsSeeders.seedMembers,name='seed8'),# test seed members from excel
+    path('seed9', viewsSeeders.seedRelationTypes,name='seed9')# test seed members from excel
 ]
 if settings.DEBUG:
      urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

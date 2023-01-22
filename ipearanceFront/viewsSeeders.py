@@ -44,7 +44,8 @@ def seedUsers(request):
             hrms_id=int(row_data[11]),
             date_joined=datetime.datetime.now(),
             is_active=True,
-            is_staff=True
+            is_staff=True,
+            member_team_name=int(row_data[12])
              )
         u.set_password(row_data[7])
         u.save()

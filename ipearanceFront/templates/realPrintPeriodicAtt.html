@@ -121,7 +121,7 @@
 
                     {% for row in summaryPeriodic %}
                     
-                    {% ifequal dep.DepName row.department %}
+                    {% if dep.DepName == row.department %}
 
 
                     <tr style="border-color:black;border-style: solid;padding:2px;margin:2%;">
@@ -133,7 +133,7 @@
                         <td style="width:12%;">{{row.averageTWrario}}</td>
                         <td style="width:12%;">{{row.averageTWork}}</td>
                     </tr>
-                    {% endifequal %}
+                    {% endif %}
                     {% endfor %}
                     {% endfor %}
 

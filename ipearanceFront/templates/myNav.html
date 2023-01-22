@@ -14,7 +14,7 @@
           <a class="navbar-brand" href="welcome">Αρχική</a>
         </li>
 
-        {% ifequal request.user.member_team_name 'Διαχειριστής' %}
+        {% if request.user.member_team_name == 'Διαχειριστής' %}
         <li class="nav-item active dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
             aria-haspopup="true" aria-expanded="false">
@@ -44,7 +44,7 @@
              <a class="dropdown-item" href="wrariaProsopikou">Προβολή/Εκτύπωση Ωραρίων Προσωπικού</a>
         </li>
         
-         {%endifequal %}
+         {%endif %}
         <li class="nav-item active dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
             aria-haspopup="true" aria-expanded="false">

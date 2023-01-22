@@ -107,8 +107,8 @@
 
 
                 {% for row in fullattendaces %}
-                {% ifequal d.day row.day %}
-                {% ifequal dep.DepName row.department %}
+                {% if d.day == row.day %}
+                {% if dep.DepName == row.department %}
 
                 <tr style="border-color:black;border-style: solid;padding:2px;margin:2%;">
                   <td style="width:30%;"><i>{{row.Role}}</i>:{{row.first_name}} {{row.last_name}}</td>
@@ -118,8 +118,8 @@
                   <td style="width:11%;">{{row.worked_hours}}</td>
                   <td style="width:15%;">{{row.Hrms}}</td>
                 </tr>
-                {% endifequal %}
-                {% endifequal %}
+                {% endif %}
+                {% endif %}
                 {% endfor %}
                 {% endfor %}
                 {% endfor %}

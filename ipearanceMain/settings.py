@@ -10,10 +10,21 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
+from environs import Env
+import dj_database_url
+
+env = Env()
+env.read_env()
+
+db_config = dj_database_url.config(conn_max_age=600, ssl_require=True)
+
 from pathlib import Path
 import os
 
 import django_heroku
+import sys
+
+sys.modules['fontawesome_free'] = __import__('fontawesome-free')
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -39,7 +50,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'fontawesome-free',
+    'fontawesome_free',
     #'datetimeutc',
     'rest_framework',
     'reset_migrations',
@@ -116,28 +127,23 @@ WSGI_APPLICATION = 'ipearanceMain.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
-# DATABASES = {
-#     'default': { 
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'dbIP4', 
-#         'USER': 'postgres', 
-#         'PASSWORD': '1',
-#         'HOST': '127.0.0.1', 
-#         'PORT': '5432',
-#     }
-# }
 
-
-DATABASES = {
-    'default': { 
+if db_config:
+    # heroku/railway - production
+    DATABASES = {}
+    DATABASES['default'] = db_config
+else:
+    # local/development
+    DATABASES = {
+       'default': { 
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'd8f7pocv9fj2os', 
-        'USER': 'zavijevgkszdsh', 
-        'PASSWORD': 'bd05ad751087735c3de508bd13eca40a1f8d798a3b31982d2cc8b0c668355ad7',
-        'HOST': 'ec2-63-33-239-176.eu-west-1.compute.amazonaws.com', 
+        'NAME': 'dbAttendance', 
+        'USER': 'postgres', 
+        'PASSWORD': '123',
+        'HOST': '127.0.0.1', 
         'PORT': '5432',
     }
-}
+    }
 
 
 

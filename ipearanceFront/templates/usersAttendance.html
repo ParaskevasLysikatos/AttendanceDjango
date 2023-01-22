@@ -149,8 +149,8 @@
                
                
                 {% if  flagUserAtt %}
-                {% ifequal d.day row.day %}
-                {% ifequal dep.department_name row.department %}
+                {% if d.day == row.day %}
+                {% if dep.department_name == row.department %}
                 
                
                 
@@ -167,13 +167,13 @@
                     <td>{{row.Hrms}}</td>
                 </tr>
                
-                {% endifequal %}
-                {% endifequal %}
+                {% endif %}
+                {% endif %}
                 {% endif %}
                 {% if not flagUserAtt %}
                  
-                {% ifequal d.day row.day %}
-                {% ifequal dep.DepName row.department %}
+                {% if d.day == row.day %}
+                {% if dep.DepName == row.department %}
                 
                  
 
@@ -190,8 +190,8 @@
                     <td>{{row.Hrms}}</td>
                 </tr>
 
-                {% endifequal %}
-                {% endifequal %}
+                {% endif %}
+                {% endif %}
                 {% endif %}
                 {% endfor %}
                 {% endfor %}
